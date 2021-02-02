@@ -1,0 +1,227 @@
+<!doctype html><html lang=zh-cn><head><meta charset=utf-8><meta http-equiv=x-ua-compatible content="IE=edge"><meta name=viewport content="width=device-width,initial-scale=1"><meta name=referrer content="no-referrer-when-downgrade"><title>解析超级虚拟实验室eve Ng的工作模式 | mlyixi的博客</title><meta property="og:title" content="解析超级虚拟实验室eve Ng的工作模式 - mlyixi的博客"><meta property="og:type" content="article"><meta property="article:published_time" content="2021-01-11T13:39:02+08:00"><meta property="article:modified_time" content="2021-01-11T13:39:02+08:00"><meta name=Keywords content="学习、研究、工作"><meta name=description content="解析超级虚拟实验室eve Ng的工作模式"><meta name=author content="mlyixi"><meta property="og:url" content="https://mlyixi.github.io/post/network/%E8%A7%A3%E6%9E%90%E8%B6%85%E7%BA%A7%E8%99%9A%E6%8B%9F%E5%AE%9E%E9%AA%8C%E5%AE%A4eve-ng%E7%9A%84%E5%B7%A5%E4%BD%9C%E6%A8%A1%E5%BC%8F/"><link rel="shortcut icon" href=https://mlyixi.github.io/favicon.ico type=image/x-icon><link rel=stylesheet href=https://mlyixi.github.io/css/normalize.css><link rel=stylesheet href=https://mlyixi.github.io/css/style.css><script type=text/javascript src=//cdn.bootcdn.net/ajax/libs/jquery/3.4.1/jquery.min.js></script><link href=https://cdn.bootcdn.net/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css rel=stylesheet></head><body><header id=header class=clearfix><div class=container><div class=col-group><div class=site-name><a id=logo href=https://mlyixi.github.io/>mlyixi的博客</a><p class=description>欲望的唤醒，信仰的坚定</p></div><div><nav id=nav-menu class=clearfix><a class=current href=https://mlyixi.github.io/>首页</a>
+<a href=https://mlyixi.github.io/tools/ title=工具>工具</a>
+<a href=https://mlyixi.github.io/archives/ title=归档>归档</a>
+<a href=https://mlyixi.github.io/about/ title=关于>关于</a></nav></div></div></div></header><div id=body><div class=container><div class=col-group><div class=col-8 id=main><div class=res-cons><style type=text/css>.post-toc{position:fixed;width:200px;margin-left:-210px;padding:5px 10px;font-family:Athelas,STHeiti,Microsoft Yahei,serif;font-size:12px;border:1px solid rgba(0,0,0,.07);border-radius:5px;background-color:rgba(255,255,255,.98);background-clip:padding-box;-webkit-box-shadow:1px 1px 2px rgba(0,0,0,.125);box-shadow:1px 1px 2px rgba(0,0,0,.125);word-wrap:break-word;white-space:nowrap;-webkit-box-sizing:border-box;box-sizing:border-box;z-index:999;cursor:pointer;max-height:70%;overflow-y:auto;overflow-x:hidden}.post-toc .post-toc-title{width:100%;margin:0 auto;font-size:20px;font-weight:400;text-transform:uppercase;text-align:center}.post-toc .post-toc-content{font-size:15px}.post-toc .post-toc-content>nav>ul{margin:10px 0}.post-toc .post-toc-content ul{padding-left:20px;list-style:square;margin:.5em;line-height:1.8em}.post-toc .post-toc-content ul ul{padding-left:15px;display:none}@media print,screen and (max-width:1057px){.post-toc{display:none}}</style><div class=post-toc style=position:absolute;top:188px><h2 class=post-toc-title>文章目录</h2><div class=post-toc-content><nav id=TableOfContents><ul><li><a href=#eve-ng的安装>eve-ng的安装</a></li><li><a href=#eve-ng的架构>eve-ng的架构</a></li><li><a href=#eve-ng的使用>eve-ng的使用</a></li><li><a href=#eve-ng平台迁移>eve-ng平台迁移</a></li></ul></nav></div></div><script type=text/javascript>$(document).ready(function(){var postToc=$(".post-toc");if(postToc.length){var leftPos=$("#main").offset().left;if(leftPos<220){postToc.css({"width":leftPos-10,"margin-left":(0-leftPos)})}
+var t=postToc.offset().top-20,a={start:{position:"absolute",top:t},process:{position:"fixed",top:20},};$(window).scroll(function(){var e=$(window).scrollTop();e<t?postToc.css(a.start):postToc.css(a.process)})}})</script><article class=post><header><h1 class=post-title>解析超级虚拟实验室eve Ng的工作模式</h1></header><date class="post-meta meta-date">2021年1月11日</date><div class=post-meta><span>|</span>
+<span class=meta-category><a href=https://mlyixi.github.io/categories/network>network</a></span>
+<span class=meta-category><a href=https://mlyixi.github.io/categories/Linux>Linux</a></span></div><div class=post-meta><span id=busuanzi_container_page_pv>|<span id=busuanzi_value_page_pv></span><span>
+阅读</span></span></div><div class=clear style=display:none><div class=toc-article><div class=toc-title>文章目录</div></div></div><div class=post-content><p>转载自<a href=https://www.douban.com/note/629657625/>https://www.douban.com/note/629657625/</a></p><p>近些年来，基于虚拟环境的网络设备或者实验室层出不穷。其中最为成功的虚拟实验室产品线以iou-web，unetlab，以及后来继承者eve-ng最为成功。因为原UNetlab的环境依旧在更新，因此现有比较吸引眼球的实验室就有UNetlabv2和eve-ng俩个了。</p><p>在对eve-ng有了一定了解后，有必要将eve-ng的工作模式进行一个简单的说明，便于大家了解。这个解析从以下几个层面进行：架构，安装与更新，使用。</p><h2 id=eve-ng的安装>eve-ng的安装</h2><p>首先，安装eve-ng时，需要在网上下载上G的iso或者ova的虚拟机文件。如果我告诉你，无论是iso还是ova，你下载的都只是ubuntu的安装介质，你会相信吗？
+事实也是如此，eve-ng的安装，只要依靠第一次开机时的联网更新所完成的。在安装介质里，与eve-ng有关的安装文件只有一个，唯一的一个，eve-setup.sh。</p><div class=highlight><div style=color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><table style=border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block><tr><td style=vertical-align:top;padding:0;margin:0;border:0><pre style=color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="margin-right:.4em;padding:0 .4em;color:#495050">1
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050">2
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050">3
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050">4
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050">5
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050">6
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050">7
+</span></code></pre></td><td style=vertical-align:top;padding:0;margin:0;border:0;width:100%><pre style=color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-zsh data-lang=zsh>eve.iso     /install/eve-setup.sh
+eve.ova    /etc/eve-setup.sh
+
+<span style=color:#719e07>==</span>build-installer-iso.sh<span style=color:#719e07>====</span>
+cp /usr/src/eve-ng-public-dev/debian/txt.cfg /tmp/eve-iso/isolinux/
+cp /usr/src/eve-ng-public-dev/debian/eve*.seed /tmp/eve-iso/preseed/
+cp /usr/src/eve-ng-public-dev/debian/eve-setup.sh /tmp/eve-iso/install/
+</code></pre></td></tr></table></div></div><p>从eve.iso的封装脚本就可以看出，整版iso，实际有用的文件非常非常少，不超过100k.</p><p>在启动虚机或者iso时，会调用eve-setup.sh脚本，然后联网，开始下载并安装必备组件和eve-ng.deb本身。eve-ng.deb里包含了三部分内容，有核心的unetlab的服务器信息，必要的后台服务加载配置文件，还有一部内容是script脚本，这个脚本负责下载并配置dynamips和qemu等各种虚机。</p><p>当然了，必要的组件包括eve-ng本身都可以离线下载，上传到ubuntu内，进行单独更新</p><div class=highlight><div style=color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><table style=border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block><tr><td style=vertical-align:top;padding:0;margin:0;border:0><pre style=color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="margin-right:.4em;padding:0 .4em;color:#495050">1
+</span></code></pre></td><td style=vertical-align:top;padding:0;margin:0;border:0;width:100%><pre style=color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-zsh data-lang=zsh><span style=color:#586e75># apt-get download eve-ng </span>
+</code></pre></td></tr></table></div></div><p>eve-ng的deb是不能单独下载的，必须通过ubuntu的apt-get完成，需要签名验证。</p><div class=highlight><div style=color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><table style=border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block><tr><td style=vertical-align:top;padding:0;margin:0;border:0><pre style=color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="margin-right:.4em;padding:0 .4em;color:#495050"> 1
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050"> 2
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050"> 3
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050"> 4
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050"> 5
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050"> 6
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050"> 7
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050"> 8
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050"> 9
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050">10
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050">11
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050">12
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050">13
+</span></code></pre></td><td style=vertical-align:top;padding:0;margin:0;border:0;width:100%><pre style=color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-zsh data-lang=zsh>wget -O - http://www.eve-ng.net/repo/eczema@ecze.com.gpg.key | sudo apt-key add -
+sudo add-apt-repository <span style=color:#2aa198>&#34;deb [arch=amd64]  http://www.eve-ng.net/repo xenial main&#34;</span>
+apt-get update
+<span style=color:#268bd2>DEBIAN_FRONTEND</span><span style=color:#719e07>=</span>noninteractive apt-get -y download eve-ng
+
+oot@eve-ng:~# dpkg -i eve-ng_2.0.3-60_amd64.deb
+<span style=color:#719e07>(</span>Reading database ... <span style=color:#2aa198>92388</span> files and directories currently installed.<span style=color:#719e07>)</span>
+Preparing to unpack eve-ng_2.0.3-60_amd64.deb ...
+Checking MySQL... <span style=color:#719e07>done</span>
+Unpacking eve-ng <span style=color:#719e07>(</span>2.0.3-60<span style=color:#719e07>)</span> over <span style=color:#719e07>(</span>2.0.3-59<span style=color:#719e07>)</span> ...
+Setting up eve-ng <span style=color:#719e07>(</span>2.0.3-60<span style=color:#719e07>)</span> ...
+Processing triggers <span style=color:#719e07>for</span> ureadahead <span style=color:#719e07>(</span>0.100.0-19<span style=color:#719e07>)</span> ...
+root@eve-ng:~#
+</code></pre></td></tr></table></div></div><p>eve-ng的安装文件，都保存在/opt的目录下。</p><p>事实上，unetlab，以及unetlabv2的安装也是这么玩的。</p><div class=highlight><div style=color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><table style=border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block><tr><td style=vertical-align:top;padding:0;margin:0;border:0><pre style=color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="margin-right:.4em;padding:0 .4em;color:#495050">1
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050">2
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050">3
+</span></code></pre></td><td style=vertical-align:top;padding:0;margin:0;border:0;width:100%><pre style=color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-zsh data-lang=zsh><span style=color:#586e75># wget -q -O- http://www.routereflector.com/unetlab/install.sh</span>
+<span style=color:#586e75># ./install.sh manager</span>
+<span style=color:#586e75># ./install.sh worker TOKEN IP</span>
+</code></pre></td></tr></table></div></div><p>作为linux平台上运行的eve-ng，各种平台的依附的不同依赖关系确实比较头疼而烦躁，由此指定ubuntu为基础平台我也能理解。但是，在搭载了ubuntu的介质后，启动时又下载重新和安装一次全新的ubuntu，我就很不能理解，哪你索性在发布时给个简版的ubuntu好了。此外，eve-ng并没有很好的去检测和分析依赖关系，安装和部署了相当多不必要的东西，实际上安装了ubuntu的整张介质。
+====注：关于update，这是ubuntu本身的问题。每次系统启动，都会调用apt-get执行update动作，确实很烦，而且没任何好办法。=====</p><h2 id=eve-ng的架构>eve-ng的架构</h2><p>相比unetlab，eve-ng并没有太多独立开发的部分出来。从结构就可以看出来，它是以集合多种组件为一体为优势存在的。</p><div class=highlight><div style=color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><table style=border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block><tr><td style=vertical-align:top;padding:0;margin:0;border:0><pre style=color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="margin-right:.4em;padding:0 .4em;color:#495050">1
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050">2
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050">3
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050">4
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050">5
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050">6
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050">7
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050">8
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050">9
+</span></code></pre></td><td style=vertical-align:top;padding:0;margin:0;border:0;width:100%><pre style=color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-zsh data-lang=zsh>root@eve-ng:~# dpkg -l | grep eve-ng
+ii eve-ng 2.0.3-59 amd64 A new generation software <span style=color:#719e07>for</span> networking labs.
+ii eve-ng-dynamips 2.0.2-2 amd64 Dynamips files <span style=color:#719e07>for</span> Eve-NG.
+ii eve-ng-guacamole 2.0.1-60 amd64 Guacamole <span style=color:#719e07>for</span> UNetLab/EVE-NG
+ii eve-ng-qemu 2.0.2-16 amd64 QEMU files <span style=color:#719e07>for</span> Eve-NG.
+ii eve-ng-schema 2.0.1-60 amd64 Database schema <span style=color:#719e07>for</span> UNetLab/EVE-NG
+ii eve-ng-vpcs1.0-eve-ng amd64 vpcs Eve-NG compatible
+ii linux-headers-4.4.14-eve-ng-ukms+4.4.14-eve-ng-ukms-brctl amd64  Header files Linux kernel,
+ii linux-image-4.4.14-eve-ng-ukms+4.4.14-eve-ng-ukms-brctl amd64 Linux kernel binary image <span style=color:#719e07>for</span> version 4.4.14-eve-ng-ukms+
+</code></pre></td></tr></table></div></div><p>从架构来看，eve-ng本身。eve-ng本质上就是在unetlab的基础上进行了定制和改进，集成了dynamips,qemu和vcps，以及涵盖了现有的所有类型的模拟器和虚拟设备。其中guacamole和schema都是对unetlab定制和改进的具体措施。<figure class="max-w-2xl mx-auto overflow-hidden"><a data-fancybox=gallery href=https://mlyixi.github.io/network/eve-ng-files.webp><img alt=Alt src=https://mlyixi.github.io/network/eve-ng-files.webp></a><figcaption class="p-2 text-center">eve-ng的目录结构</figcaption></figure></p><p>说明：</p><ol><li>control, 包含eve-ng安装的俩个重要脚本，preinstall和postinstall.
+preinstall: 对eve-ng安装必须的mysql进行初始化和用户创建，迁移，以及eve-ng-schema里的sql脚本等。<br>postinstall: 安装后配置脚本，包括启动服务，apache2的配置，grub安装，plymouth配置，tap配置等。这是保证系统重启后能正常工作的必要前提。</li><li>/opt/ovf: EVE-NG setup脚本。主要包括密码，hostname及网络配置。该脚本通过/etc/init/ovfconfig.conf和/etc/profile.d/ovf.sh在系统启动时调用。</li><li>/opt/unetlab/includes unetlab基于php的管理控制脚本，诸如节点，网络，试验环境等。</li><li>/opt/unetlab/includes/init.php unetlab的初始化脚本。</li><li>/opt/unetlab/includes/templates 不同类型节点的配置模板，如asav, junos,xrv等。</li><li>/opt/unetlab/scripts eve-ng平台的管理脚本。这些脚本主要是做发布所用，而不是实际管理和操作。</li><li>/usr eve-ng的主题目录，plymouth调用。</li><li>/etc 各不同组件的配置文件。如apache2,lograte, systemd等。</li></ol><h2 id=eve-ng的使用>eve-ng的使用</h2><p>eve-ng缺省登录： <a href=http://x.x.x.x>http://x.x.x.x</a> username: admin passwd: eve
+eve-ng的使用确实比iou-web要快捷很多，也稳定很多。所有工作都可以通过web点击完成，速度很快，这点很好。
+个人安装完成的eve-ng，不支持ftp传输，连ftp的命令都没有。文件传不上去，也拉不下来，太头疼了。很多必备的工具都需要手动配置
+apt-get install ftp nano</p><p>unetlab的缺省登录： root with default passwd unl</p><h2 id=eve-ng平台迁移>eve-ng平台迁移</h2><p>能不能顺利迁移至其他平台，安装和更新脚本都是次要的，如何处理好其中组件的依赖关系才最重要。我们先看看UnetLabv2的依赖关系。
+UNetLabv2 is based on:</p><div class=highlight><div style=color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><table style=border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block><tr><td style=vertical-align:top;padding:0;margin:0;border:0><pre style=color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="margin-right:.4em;padding:0 .4em;color:#495050"> 1
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050"> 2
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050"> 3
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050"> 4
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050"> 5
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050"> 6
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050"> 7
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050"> 8
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050"> 9
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050">10
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050">11
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050">12
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050">13
+</span></code></pre></td><td style=vertical-align:top;padding:0;margin:0;border:0;width:100%><pre style=color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-zsh data-lang=zsh>Docker: controller, routers and lab nodes run inside a Docker container;
+Python: no more C, PHP or Bash, only Python 3;
+Python-Flask + NGINX implement and expose APIs;
+Memcached caches authentication <span style=color:#719e07>for</span> a better user experience;
+Celery + Redis manages asynchronous long tasks in the background;
+MariaDB stores all data/user and running labs;
+Git stores original labs with a version control;
+jQuery + Bootstrap will implement the UI as a single page app;
+iptables + Linux bridge allow to connect to just started lab nodes via SSH;
+IOL, QEMU and Dynamips run lab nodes.
+再看看eve-ng的依赖关系
+Pre-Depends: eve-ng-schema <span style=color:#719e07>(</span>&gt;<span style=color:#719e07>=</span> 2.0.1-23<span style=color:#719e07>)</span>, eve-ng-guacamole <span style=color:#719e07>(</span>&gt;<span style=color:#719e07>=</span> 2.0.1-23<span style=color:#719e07>)</span>, mysql-server
+Depends: apache2, bridge-utils, build-essential, cpulimit, debconf-utils, dialog, dmidecode, eve-ng-guacamole, eve-ng-schema, genisoimage, iptables, lib32gcc1, lib32z1, libapache2-mod-php, php-xml, libc6, libc6-i386, libelf1, libpcap0.8, libsdl1.2debian, linux-image-4.4.14-eve-ng-ukms+, linux-headers-4.4.14-eve-ng-ukms+, logrotate, lsb-release, lvm2, ntp, openvswitch-testcontroller, openvswitch-switch, php, php-cli, php-imagick, php-mysql, php-sqlite3, plymouth-label, python3-pexpect, sqlite3, tcpdump, telnet, uml-utilities, eve-ng-dynamips <span style=color:#719e07>(</span>&gt;<span style=color:#719e07>=</span> 0.8.6-44<span style=color:#719e07>)</span>, eve-ng-qemu <span style=color:#719e07>(</span>&gt;<span style=color:#719e07>=</span> 1.0.0-6<span style=color:#719e07>)</span>, eve-ng-vpcs, zip, libguestfs-tools
+</code></pre></td></tr></table></div></div><p>现在可以确认的依赖组件有
+必备组件：</p><ul><li>php</li><li>apache</li><li>mysql/mariadb</li><li>guacamole</li><li>python 3</li><li>bridge-utils/cpulimit/iptables/logrotate/lsb-release/tcpdump/telnet/uml-utilities</li><li>openvswitch</li><li>sqlite3</li><li>libguestfs-tools</li></ul><p>除了必要的依赖组件外，比较麻烦是各种组件需要有一个初始化配置，诸如apache, guacamole等需要处理。这些脚本要全抓出来，并梳理出来，比较麻烦。</p><p>eve-ng的移植流程
+尝试从ubuntu到gentoo的移植，非常有挑战性，经历了重重困难，有所收获但是也有诸多问题。总体来说，这是一个不怎么成功的尝试，从实践的角度来看，收益颇丰，尝试还是非常值得的。</p><ol><li>安装必备的依赖程序。诸如sqlite, mysql, php, guacamole等。之后进行必要的配置和启动服务<ul><li>mysql安装完成后，需要对mysql进行初始化。
+<code>emerge --config dev-db/mariadb #设置mysql的root密码。</code></li></ul></li><li>安装guacamole应用及配置。<ul><li>运行guacamole的preinst脚本
+*执行guac_install_v1.5.sh安装配置脚本，主要是执行guac的sql设置脚本。
+*运行postinstall脚本，设置guacamole的启动脚本。
+*guacamole要用tomcat提供www服务，因此需要特别设置tomcat的启动进程。</li></ul></li></ol><div class=highlight><div style=color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><table style=border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block><tr><td style=vertical-align:top;padding:0;margin:0;border:0><pre style=color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="margin-right:.4em;padding:0 .4em;color:#495050"> 1
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050"> 2
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050"> 3
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050"> 4
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050"> 5
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050"> 6
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050"> 7
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050"> 8
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050"> 9
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050">10
+</span></code></pre></td><td style=vertical-align:top;padding:0;margin:0;border:0;width:100%><pre style=color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-zsh data-lang=zsh><span style=color:#586e75>#/usr/share/tomcat-8/gentoo/tomcat-instance-manager.bash --create --suffix eve-ng --user root --group root</span>
+Successfully created instance <span style=color:#2aa198>&#39;tomcat-8-eve-ng&#39;</span>
+It<span style=color:#2aa198>&#39;s strongly recommended for production systems to go carefully through the configuration files at &#39;</span>/etc/tomcat-8-eve-ng&#39;.
+The generated initial configuration is close to upstreams default which favours the demo aspect over hardening.
+root@anixter init.d <span style=color:#586e75># /etc/init.d/tomcat-8-eve-ng start</span>
+ * Starting tomcat-8-eve-ng ...                                           <span style=color:#719e07>[</span> ok <span style=color:#719e07>]</span>
+root@anixter init.d <span style=color:#586e75># </span>
+root@anixter init.d <span style=color:#586e75># rc-update add tomcat-8-eve-ng default</span>
+ * service tomcat-8-eve-ng added to runlevel default
+root@anixter init.d <span style=color:#586e75># cp -a /etc/tomcat8/server-guacamole.xml /etc/tomcat8/server.xml &amp;&gt; /dev/null</span>
+</code></pre></td></tr></table></div></div><ol start=3><li>安装和配置eve-ng</li></ol><ul><li>运行eve-ng的preinstall脚本，主要设置eve-ng的数据库参数，诸如用户口令等。同时执行schema里的sql脚本，进行数* 据库初始化。</li><li>解包并复制eve-ng的文件到/opt指定位置</li><li>运行eve-ng的postinstall脚本，进行权限设置，各组件的自启动进程设定，以及虚拟站点的设置等。</li><li>解包eve-ng各组件的配置文件到/etc，/usr等目录。</li></ul><ol start=4><li><p>安装配置其他各组件到/opt对应位置。</p></li><li><p>查找_lab.php和unl_fixpermission里，关于chown的代码并修改为正确的apache启动用户。
+改代码太复杂了，不如直接改/etc/passwd和/etc/group</p></li></ol><div class=highlight><div style=color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><table style=border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block><tr><td style=vertical-align:top;padding:0;margin:0;border:0><pre style=color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="margin-right:.4em;padding:0 .4em;color:#495050">1
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050">2
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050">3
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050">4
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050">5
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050">6
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050">7
+</span></code></pre></td><td style=vertical-align:top;padding:0;margin:0;border:0;width:100%><pre style=color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-zsh data-lang=zsh><span style=color:#586e75>#more /etc/passwd</span>
+www-data:x:33:33:www-data:/var/www:/usr/sbin/nologin
+unl0:x:32768:32768:Unified Networking Lab <span style=color:#268bd2>TID</span><span style=color:#719e07>=</span>0:/opt/unetlab/tmp/0:/bin/bash
+
+<span style=color:#586e75>#more /etc/group</span>
+www-data:x:33:
+unl:x:32768:
+</code></pre></td></tr></table></div></div><p>注意：这里切记，www-data的用户一定要和运行apache的用户保持一致。</p><p>从理论上来讲，到此为止，所有的安装配置已经完成。事实上来看，到此已经可以通过浏览器访问并登录eve-ng，很多功能已经可以实现。
+成功之处：</p><ol><li>可以通过PDO连接mysql，实现Eve-ng的登录控制。</li><li>可以实现用户的增减等管理操作。</li><li>可以实现对文件和目录的操作。</li><li>增加或删除lab，编辑lab内的节点并进行配置。</li><li>正确显示system status。
+不足之处：</li><li>在运行iol node时，提示Error when connect to AF_Unix，网上高人指点是iou的license设置不对。但是我的license没问题，单独跑iol都可以。直接挂在iol_wrapper下就过不去，肯定不管license事。</li><li>qemu采用特定的参数在ubuntu下编译，在gentoo下运行会报缺少动态库。</li></ol><p>以上这俩个问题比较难处理，iol_wrapper和qemu都是编译过的二进制代码。qemu可以重新编译，但是iol_wrapper只能重新自己写个wrapper了。否则就只能运行一些windows或者原生的系统，无法做到全兼容。</p><p>在对iol_wrapper的源码分析后，可以得知，不同linux下对于connect返回值的不同，导致结果截然不同。</p><div class=highlight><div style=color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><table style=border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block><tr><td style=vertical-align:top;padding:0;margin:0;border:0><pre style=color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="margin-right:.4em;padding:0 .4em;color:#495050">1
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050">2
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050">3
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050">4
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050">5
+</span></code></pre></td><td style=vertical-align:top;padding:0;margin:0;border:0;width:100%><pre style=color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-c data-lang=c><span style=color:#719e07>/</span>wrappers<span style=color:#719e07>/</span>include<span style=color:#719e07>/</span>afsocket.c
+   <span style=color:#719e07>while</span> (connect(<span style=color:#719e07>*</span>remote_socket, (<span style=color:#719e07>struct</span> sockaddr <span style=color:#719e07>*</span>)<span style=color:#719e07>&amp;</span>remote_addr, <span style=color:#719e07>sizeof</span>(<span style=color:#719e07>struct</span> sockaddr_un)) <span style=color:#719e07>&lt;</span> <span style=color:#2aa198>0</span>) {
+        rc <span style=color:#719e07>=</span> <span style=color:#2aa198>2</span>;
+        UNLLog(LLERROR, <span style=color:#2aa198>&#34;Error while connecting local AF_UNIX: %s (%i)</span><span style=color:#cb4b16>\n</span><span style=color:#2aa198>&#34;</span>,strerror(errno), rc);
+        <span style=color:#719e07>return</span> rc;
+</code></pre></td></tr></table></div></div><p>到此为止，就可以清理战场了。</p><p>结论：在gentoo下移植eve-ng，也并非完全不可能，只是这个成本太高。如果一定要用eve-ng，后续可以单独分一个分区安装ubuntu，并在此基础上运行eve-ng。如果能处理好ubuntu对grub的复写问题，这将是最为简洁也最为可能的一种方式了。</p></div><div class=post-archive><ul class=post-copyright><li><strong>原文作者：</strong><a rel=author href=https://mlyixi.github.io/>mlyixi</a></li><li style=word-break:break-all><strong>原文链接：</strong><a href=https://mlyixi.github.io/post/network/%E8%A7%A3%E6%9E%90%E8%B6%85%E7%BA%A7%E8%99%9A%E6%8B%9F%E5%AE%9E%E9%AA%8C%E5%AE%A4eve-ng%E7%9A%84%E5%B7%A5%E4%BD%9C%E6%A8%A1%E5%BC%8F/>https://mlyixi.github.io/post/network/%E8%A7%A3%E6%9E%90%E8%B6%85%E7%BA%A7%E8%99%9A%E6%8B%9F%E5%AE%9E%E9%AA%8C%E5%AE%A4eve-ng%E7%9A%84%E5%B7%A5%E4%BD%9C%E6%A8%A1%E5%BC%8F/</a></li><li><strong>版权声明：</strong>本作品采用<a rel=license href=https://creativecommons.org/licenses/by-nc-nd/4.0/>知识共享署名-非商业性使用-禁止演绎 4.0 国际许可协议</a>进行许可，非商业转载请注明出处（作者，原文链接），商业转载请联系作者获得授权。</li></ul></div><br><div class=post-archive><h2>See Also</h2><ul class=listing><li><a href=https://mlyixi.github.io/post/network/eve-ng%E5%AE%89%E8%A3%85%E4%BD%BF%E7%94%A8/>EVE-NG安装使用</a></li><li><a href=https://mlyixi.github.io/post/signal/gnuradio3.8%E5%AE%89%E8%A3%85%E8%AF%B4%E6%98%8E/>Gnuradio</a></li><li><a href=https://mlyixi.github.io/post/signal/gnuradio3.7%E5%AE%89%E8%A3%85%E8%AF%B4%E6%98%8E/>Gnuradio3.7安装说明</a></li><li><a href=https://mlyixi.github.io/post/ml/binarygan%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/>Binarygan源码分析</a></li><li><a href=https://mlyixi.github.io/post/cs/win10install/>Win10install</a></li></ul></div><div class="post-meta meta-tags"><ul class=clearfix><li><a href=https://mlyixi.github.io/tags/eve-ng>eve-ng</a></li></ul></div></article></div><footer id=footer><div>&copy; 2021 <a href=https://mlyixi.github.io/>mlyixi的博客 By mlyixi</a></div><br><div><div class=github-badge><a href=https://gohugo.io/ target=_black rel=nofollow><span class=badge-subject>Powered by</span><span class="badge-value bg-blue">Hugo</span></a></div><div class=github-badge><a href=https://www.flysnow.org/ target=_black><span class=badge-subject>Design by</span><span class="badge-value bg-brightgreen">飞雪无情</span></a></div><div class=github-badge><a href=https://github.com/flysnow-org/maupassant-hugo target=_black><span class=badge-subject>Theme</span><span class="badge-value bg-yellowgreen">Maupassant</span></a></div></div></footer><script type=text/javascript>window.MathJax={tex2jax:{inlineMath:[['$','$']],processEscapes:true}};</script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML" async></script><script src=https://cdn.bootcdn.net/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js></script><a id=rocket href=#top></a><script type=text/javascript src="https://mlyixi.github.io/js/totop.js?v=0.0.0" async></script><script type=text/javascript src=//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js async></script></div><div id=secondary><section class=widget><form id=search action=https://mlyixi.github.io/search/ method=get accept-charset=utf-8 target=_blank _lpchecked=1><input type=text name=q maxlength=20 placeholder=Search>
+<input type=hidden name=sitesearch value=https://mlyixi.github.io/>
+<button type=submit class="submit icon-search"></button></form></section><section class=widget><h3 class=widget-title>最近文章</h3><ul class=widget-list><li><a href=https://mlyixi.github.io/post/cs/git%E7%AE%80%E6%98%93%E6%9C%8D%E5%8A%A1%E5%99%A8/ title=git简易服务器>git简易服务器</a></li><li><a href=https://mlyixi.github.io/post/network/dpi%E5%B7%A5%E5%85%B7%E6%AF%94%E8%BE%83/ title=DPI工具比较>DPI工具比较</a></li><li><a href=https://mlyixi.github.io/post/network/tinyfecVPN/ title=TinyfecVPN>TinyfecVPN</a></li><li><a href=https://mlyixi.github.io/post/linux/NFS%E6%9C%8D%E5%8A%A1%E5%99%A8/ title=NFS服务器>NFS服务器</a></li><li><a href=https://mlyixi.github.io/post/network/IOL_DHCP%E9%85%8D%E7%BD%AE/ title=IOL_DHCP配置>IOL_DHCP配置</a></li><li><a href=https://mlyixi.github.io/post/cs/mysql%E5%90%AF%E7%94%A8%E8%BF%9C%E7%A8%8B%E8%BF%9E%E6%8E%A5/ title=Mysql启用远程连接>Mysql启用远程连接</a></li><li><a href=https://mlyixi.github.io/post/network/security_onion%E4%B8%8EOSSIM%E6%AF%94%E8%BE%83/ title=Security_onion与OSSIM比较>Security_onion与OSSIM比较</a></li><li><a href=https://mlyixi.github.io/post/cs/%E4%BB%A3%E7%A0%81%E5%A4%A7%E5%85%A8/ title=代码大全>代码大全</a></li><li><a href=https://mlyixi.github.io/post/network/%E7%BD%91%E7%BB%9C%E7%A9%BA%E9%97%B4%E6%B5%8B%E7%BB%98%E6%8A%80%E6%9C%AF/ title=网络空间测绘技术>网络空间测绘技术</a></li><li><a href=https://mlyixi.github.io/post/network/%E8%A7%A3%E6%9E%90%E8%B6%85%E7%BA%A7%E8%99%9A%E6%8B%9F%E5%AE%9E%E9%AA%8C%E5%AE%A4eve-ng%E7%9A%84%E5%B7%A5%E4%BD%9C%E6%A8%A1%E5%BC%8F/ title="解析超级虚拟实验室eve Ng的工作模式">解析超级虚拟实验室eve Ng的工作模式</a></li></ul></section><section class=widget><h3 class=widget-title><a href=https://mlyixi.github.io/categories/>分类</a></h3><ul class=widget-list><li><a href=https://mlyixi.github.io/categories/CS/>CS (34)</a></li><li><a href=https://mlyixi.github.io/categories/Linux/>Linux (26)</a></li><li><a href=https://mlyixi.github.io/categories/ML/>ML (6)</a></li><li><a href=https://mlyixi.github.io/categories/OSX/>OSX (10)</a></li><li><a href=https://mlyixi.github.io/categories/math/>math (24)</a></li><li><a href=https://mlyixi.github.io/categories/network/>network (14)</a></li><li><a href=https://mlyixi.github.io/categories/signal/>signal (3)</a></li><li><a href=https://mlyixi.github.io/categories/social/>social (5)</a></li></ul></section><section class=widget><h3 class=widget-title><a href=https://mlyixi.github.io/tags/>标签</a></h3><div class=tagcloud><a href=https://mlyixi.github.io/tags/Archlinux/>Archlinux</a>
+<a href=https://mlyixi.github.io/tags/CodeSignBreak%E5%8F%91%E5%B8%83/>CodeSignBreak发布</a>
+<a href=https://mlyixi.github.io/tags/DHCP/>DHCP</a>
+<a href=https://mlyixi.github.io/tags/DPI/>DPI</a>
+<a href=https://mlyixi.github.io/tags/Doxygen/>Doxygen</a>
+<a href=https://mlyixi.github.io/tags/GAN/>GAN</a>
+<a href=https://mlyixi.github.io/tags/Graphviz/>Graphviz</a>
+<a href=https://mlyixi.github.io/tags/IOL/>IOL</a>
+<a href=https://mlyixi.github.io/tags/IPv6/>IPv6</a>
+<a href=https://mlyixi.github.io/tags/KDE/>KDE</a>
+<a href=https://mlyixi.github.io/tags/MAB/>MAB</a>
+<a href=https://mlyixi.github.io/tags/MATLAB/>MATLAB</a>
+<a href=https://mlyixi.github.io/tags/MathJax/>MathJax</a>
+<a href=https://mlyixi.github.io/tags/Mysql/>Mysql</a>
+<a href=https://mlyixi.github.io/tags/NFS/>NFS</a>
+<a href=https://mlyixi.github.io/tags/OSSIM/>OSSIM</a>
+<a href=https://mlyixi.github.io/tags/PATH/>PATH</a>
+<a href=https://mlyixi.github.io/tags/PRML/>PRML</a>
+<a href=https://mlyixi.github.io/tags/PT/>PT</a>
+<a href=https://mlyixi.github.io/tags/ProGit/>ProGit</a>
+<a href=https://mlyixi.github.io/tags/SecurityOnion/>SecurityOnion</a>
+<a href=https://mlyixi.github.io/tags/UEFI/>UEFI</a>
+<a href=https://mlyixi.github.io/tags/VPS/>VPS</a>
+<a href=https://mlyixi.github.io/tags/Windows/>Windows</a>
+<a href=https://mlyixi.github.io/tags/aircrack-ng/>aircrack-ng</a>
+<a href=https://mlyixi.github.io/tags/bash/>bash</a>
+<a href=https://mlyixi.github.io/tags/bind9/>bind9</a>
+<a href=https://mlyixi.github.io/tags/cmake/>cmake</a>
+<a href=https://mlyixi.github.io/tags/docker/>docker</a>
+<a href=https://mlyixi.github.io/tags/eve-ng/>eve-ng</a>
+<a href=https://mlyixi.github.io/tags/git/>git</a>
+<a href=https://mlyixi.github.io/tags/github/>github</a>
+<a href=https://mlyixi.github.io/tags/gnuradio/>gnuradio</a>
+<a href=https://mlyixi.github.io/tags/gpg/>gpg</a>
+<a href=https://mlyixi.github.io/tags/hackintosh/>hackintosh</a>
+<a href=https://mlyixi.github.io/tags/homebrew/>homebrew</a>
+<a href=https://mlyixi.github.io/tags/iOS/>iOS</a>
+<a href=https://mlyixi.github.io/tags/iproute/>iproute</a>
+<a href=https://mlyixi.github.io/tags/iptables/>iptables</a>
+<a href=https://mlyixi.github.io/tags/latex/>latex</a>
+<a href=https://mlyixi.github.io/tags/man/>man</a>
+<a href=https://mlyixi.github.io/tags/markdown/>markdown</a>
+<a href=https://mlyixi.github.io/tags/n2n/>n2n</a>
+<a href=https://mlyixi.github.io/tags/nc/>nc</a>
+<a href=https://mlyixi.github.io/tags/ntp/>ntp</a>
+<a href=https://mlyixi.github.io/tags/postgresql/>postgresql</a>
+<a href=https://mlyixi.github.io/tags/python/>python</a>
+<a href=https://mlyixi.github.io/tags/signal/>signal</a>
+<a href=https://mlyixi.github.io/tags/ubuntu/>ubuntu</a>
+<a href=https://mlyixi.github.io/tags/vim/>vim</a>
+<a href=https://mlyixi.github.io/tags/vpn/>vpn</a>
+<a href=https://mlyixi.github.io/tags/vscode/>vscode</a>
+<a href=https://mlyixi.github.io/tags/wireshark/>wireshark</a>
+<a href=https://mlyixi.github.io/tags/zsh/>zsh</a>
+<a href=https://mlyixi.github.io/tags/%E4%BA%A4%E6%8D%A2/>交换</a>
+<a href=https://mlyixi.github.io/tags/%E5%8F%A4%E5%85%B8%E8%87%AA%E7%94%B1%E4%B8%BB%E4%B9%89/>古典自由主义</a>
+<a href=https://mlyixi.github.io/tags/%E5%A4%9A%E7%BD%91%E5%8D%A1/>多网卡</a>
+<a href=https://mlyixi.github.io/tags/%E5%BC%80%E6%BA%90/>开源</a>
+<a href=https://mlyixi.github.io/tags/%E6%8A%A5%E6%96%87/>报文</a>
+<a href=https://mlyixi.github.io/tags/%E6%95%B0%E6%8D%AE%E5%8C%85/>数据包</a>
+<a href=https://mlyixi.github.io/tags/%E6%9D%82%E8%B0%88/>杂谈</a>
+<a href=https://mlyixi.github.io/tags/%E6%A6%82%E7%8E%87%E8%AE%BA/>概率论</a>
+<a href=https://mlyixi.github.io/tags/%E6%B5%8B%E7%BB%98/>测绘</a>
+<a href=https://mlyixi.github.io/tags/%E7%A1%AC%E7%9B%98/>硬盘</a>
+<a href=https://mlyixi.github.io/tags/%E7%BD%91%E5%85%B3/>网关</a>
+<a href=https://mlyixi.github.io/tags/%E8%BD%AF%E4%BB%B6/>软件</a></div></section><section class=widget><h3 class=widget-title>其它</h3><ul class=widget-list><li><a href=https://mlyixi.github.io/index.xml>文章 RSS</a></li></ul></section></div></div></div></div></body></html>

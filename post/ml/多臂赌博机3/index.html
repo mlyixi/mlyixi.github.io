@@ -1,0 +1,89 @@
+<!doctype html><html lang=zh-cn><head><meta charset=utf-8><meta http-equiv=x-ua-compatible content="IE=edge"><meta name=viewport content="width=device-width,initial-scale=1"><meta name=referrer content="no-referrer-when-downgrade"><title>多臂赌博机3 | mlyixi的博客</title><meta property="og:title" content="多臂赌博机3 - mlyixi的博客"><meta property="og:type" content="article"><meta property="article:published_time" content="2014-10-11T14:08:52+08:00"><meta property="article:modified_time" content="2014-10-11T14:08:52+08:00"><meta name=Keywords content="学习、研究、工作"><meta name=description content="多臂赌博机3"><meta name=author content="mlyixi"><meta property="og:url" content="https://mlyixi.github.io/post/ml/%E5%A4%9A%E8%87%82%E8%B5%8C%E5%8D%9A%E6%9C%BA3/"><link rel="shortcut icon" href=https://mlyixi.github.io/favicon.ico type=image/x-icon><link rel=stylesheet href=https://mlyixi.github.io/css/normalize.css><link rel=stylesheet href=https://mlyixi.github.io/css/style.css><script type=text/javascript src=//cdn.bootcdn.net/ajax/libs/jquery/3.4.1/jquery.min.js></script><link href=https://cdn.bootcdn.net/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css rel=stylesheet></head><body><header id=header class=clearfix><div class=container><div class=col-group><div class=site-name><a id=logo href=https://mlyixi.github.io/>mlyixi的博客</a><p class=description>欲望的唤醒，信仰的坚定</p></div><div><nav id=nav-menu class=clearfix><a class=current href=https://mlyixi.github.io/>首页</a>
+<a href=https://mlyixi.github.io/tools/ title=工具>工具</a>
+<a href=https://mlyixi.github.io/archives/ title=归档>归档</a>
+<a href=https://mlyixi.github.io/about/ title=关于>关于</a></nav></div></div></div></header><div id=body><div class=container><div class=col-group><div class=col-8 id=main><div class=res-cons><style type=text/css>.post-toc{position:fixed;width:200px;margin-left:-210px;padding:5px 10px;font-family:Athelas,STHeiti,Microsoft Yahei,serif;font-size:12px;border:1px solid rgba(0,0,0,.07);border-radius:5px;background-color:rgba(255,255,255,.98);background-clip:padding-box;-webkit-box-shadow:1px 1px 2px rgba(0,0,0,.125);box-shadow:1px 1px 2px rgba(0,0,0,.125);word-wrap:break-word;white-space:nowrap;-webkit-box-sizing:border-box;box-sizing:border-box;z-index:999;cursor:pointer;max-height:70%;overflow-y:auto;overflow-x:hidden}.post-toc .post-toc-title{width:100%;margin:0 auto;font-size:20px;font-weight:400;text-transform:uppercase;text-align:center}.post-toc .post-toc-content{font-size:15px}.post-toc .post-toc-content>nav>ul{margin:10px 0}.post-toc .post-toc-content ul{padding-left:20px;list-style:square;margin:.5em;line-height:1.8em}.post-toc .post-toc-content ul ul{padding-left:15px;display:none}@media print,screen and (max-width:1057px){.post-toc{display:none}}</style><div class=post-toc style=position:absolute;top:188px><h2 class=post-toc-title>文章目录</h2><div class=post-toc-content><nav id=TableOfContents><ul><li><a href=#问题>问题</a></li><li><a href=#定义>定义</a></li><li><a href=#exp3>EXP3</a></li></ul></nav></div></div><script type=text/javascript>$(document).ready(function(){var postToc=$(".post-toc");if(postToc.length){var leftPos=$("#main").offset().left;if(leftPos<220){postToc.css({"width":leftPos-10,"margin-left":(0-leftPos)})}
+var t=postToc.offset().top-20,a={start:{position:"absolute",top:t},process:{position:"fixed",top:20},};$(window).scroll(function(){var e=$(window).scrollTop();e<t?postToc.css(a.start):postToc.css(a.process)})}})</script><article class=post><header><h1 class=post-title>多臂赌博机3</h1></header><date class="post-meta meta-date">2014年10月11日</date><div class=post-meta><span>|</span>
+<span class=meta-category><a href=https://mlyixi.github.io/categories/ML>ML</a></span></div><div class=post-meta><span id=busuanzi_container_page_pv>|<span id=busuanzi_value_page_pv></span><span>
+阅读</span></span></div><div class=clear style=display:none><div class=toc-article><div class=toc-title>文章目录</div></div></div><div class=post-content><p>在上两节我们讨论的UCB系列算法面对的情况是静态的,即各臂的分布参数不会改变,于是我们就"乐观地面对不确定性"&ndash;根据采样平均值尽快地确定那个最好的臂.</p><p>但是在现实世界中收益结构是更复杂的,非静态的.特别是当它涉及到竞争的场景,如股票交易.我们称之为<code>对抗模式多臂赌博机(adversarial bandit)</code></p><h2 id=问题>问题</h2><p>数学化的问题描述可以参考<a href="http://mlyixi.byethost32.com/blog/?p=155">第一节</a>.</p><p>但是对于奖励矢量,有些异同:</p><ul><li>它和静态时一样,必须是预先固定的.</li><li>各臂奖励期望随着轮数是变化的(准确地说是没有期望,或者说期望被对手动了手脚)</li></ul><p>这时我们可以思考这种情况:对手能否总把参与者下一次的收益设为零?</p><h2 id=定义>定义</h2><p>回想之前的UCB策略形成过程,我们的目标是尽快地选择那个期望最大的臂,并计算其与期望最大臂实际给出的奖励的差值作为遗憾.</p><p>现在我们的目标更复杂了:我们知道臂的统计参数是变化的!!! 我们显然不能指望选择总选择那个采样平均最大的臂了.</p><p>所以这里的策略也应该改变: 它是一种选择序列,虽然UCB最终也是给出一个序列,但是那个序列最终是<code>收敛</code>的,而现在的序列是<code>不收敛</code>的.</p><blockquote><p>定义:策略序列和收益
+策略A给定一个选择序列$\vec{j}=(j_1,\ldots,j_t)$,在$t$轮后总的收益是:
+$$
+G_A(t)=G_{\vec{j}}(t)=\sum_s^t X_{j_s}(s)
+$$</p></blockquote><p>那么我们用什么来作为理想状态呢? 当然是我们知道全部的奖励结果时.但是显然, 这是的遗憾太强了, 想想看,我们在静态时(UCB)都没这么做.</p><p>所以我们需要定义一个弱的遗憾,类似于UCB(同一个作者提出的嘛),我们定义理想状态是那个最佳单操作,即那些最蠢的操作里面最好的那个操作(总选择一个臂).</p><blockquote><p>定义:弱遗憾$R_A(T)$为:
+$$
+R_A(T)=G_{\max}(T)-G_A(T)=(\max\sum_{t=1}^T X_i(t))-\mathbb(G_A(T))
+$$</p></blockquote><h2 id=exp3>EXP3</h2><p>为什么叫EXP3? 因为是Exponential-weight algorithm for Exploration and Exploitation的缩写,指的是勘探和开发的指数权重算法.</p><blockquote><p>EXP3算法
+设置$\gamma\in [0,1]$,初始化权重因子$\omega_i(1)=1, i=1,\ldots,K$
+每一轮$t$:</p><blockquote><ol><li>$p_i(t)=(1-\gamma)\frac{\omega_i(t)}{\sum_{j=1}^{K}\omega_j(t)}+\frac{\gamma}{K}$</li><li>根据$p_i(t)$的分布随机生成$i_t$作为下一次选择的臂</li><li>定义估计量$ \hat{X}(t) = X_{i_t}(t)/p_{i_t}(t)$</li><li>更新选中臂的权重因子$\omega_{i_t}(t+1)=\omega_{i_t}(t)\exp (\gamma \hat{X}_{i_t}(t)/K)$, 其它臂$\omega_j(t+1)=\omega_j(t)$</li></ol></blockquote></blockquote><p>那么它的弱遗憾是对数增长的:</p><blockquote><p>定理
+对于EXP算法,在任意的轮数$T$下,其遗憾的期望满足
+$$
+R_A(T)\le (e-1)\gamma G_{\max}(T)+\frac{K\ln K}{\gamma}
+$$
+证明从略.</p></blockquote><p>这里问题来了,我们应该怎么选择$\gamma$呢?</p><blockquote><p>推论
+如果$G_{\max}(T)\le g$,则$\gamma=\min(1,\sqrt{\frac{K\ln K}{(e-1)g}})$</p></blockquote></div><div class=post-archive><ul class=post-copyright><li><strong>原文作者：</strong><a rel=author href=https://mlyixi.github.io/>mlyixi</a></li><li style=word-break:break-all><strong>原文链接：</strong><a href=https://mlyixi.github.io/post/ml/%E5%A4%9A%E8%87%82%E8%B5%8C%E5%8D%9A%E6%9C%BA3/>https://mlyixi.github.io/post/ml/%E5%A4%9A%E8%87%82%E8%B5%8C%E5%8D%9A%E6%9C%BA3/</a></li><li><strong>版权声明：</strong>本作品采用<a rel=license href=https://creativecommons.org/licenses/by-nc-nd/4.0/>知识共享署名-非商业性使用-禁止演绎 4.0 国际许可协议</a>进行许可，非商业转载请注明出处（作者，原文链接），商业转载请联系作者获得授权。</li></ul></div><br><div class=post-archive><h2>See Also</h2><ul class=listing><li><a href=https://mlyixi.github.io/post/ml/%E5%A4%9A%E8%87%82%E8%B5%8C%E5%8D%9A%E6%9C%BA2/>多臂赌博机2</a></li><li><a href=https://mlyixi.github.io/post/ml/%E5%A4%9A%E8%87%82%E8%B5%8C%E5%8D%9A%E6%9C%BA1/>多臂赌博机1</a></li><li><a href=https://mlyixi.github.io/post/ml/pymaBandit%E8%AF%B4%E6%98%8E/>pymaBandit说明</a></li><li><a href=https://mlyixi.github.io/post/social/%E4%B8%80%E4%B8%AA%E6%99%AE%E9%80%9A%E6%80%A5%E8%AF%8A%E7%9A%84%E8%8A%B1%E9%94%80/>一个普通急诊的花销</a></li><li><a href=https://mlyixi.github.io/post/math/%E6%A6%82%E7%8E%87%E8%AE%BA3-%E6%9D%A1%E4%BB%B6%E6%A6%82%E7%8E%87/>概率论3-条件概率</a></li></ul></div><div class="post-meta meta-tags"><ul class=clearfix><li><a href=https://mlyixi.github.io/tags/MAB>MAB</a></li></ul></div></article></div><footer id=footer><div>&copy; 2021 <a href=https://mlyixi.github.io/>mlyixi的博客 By mlyixi</a></div><br><div><div class=github-badge><a href=https://gohugo.io/ target=_black rel=nofollow><span class=badge-subject>Powered by</span><span class="badge-value bg-blue">Hugo</span></a></div><div class=github-badge><a href=https://www.flysnow.org/ target=_black><span class=badge-subject>Design by</span><span class="badge-value bg-brightgreen">飞雪无情</span></a></div><div class=github-badge><a href=https://github.com/flysnow-org/maupassant-hugo target=_black><span class=badge-subject>Theme</span><span class="badge-value bg-yellowgreen">Maupassant</span></a></div></div></footer><script type=text/javascript>window.MathJax={tex2jax:{inlineMath:[['$','$']],processEscapes:true}};</script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML" async></script><script src=https://cdn.bootcdn.net/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js></script><a id=rocket href=#top></a><script type=text/javascript src="https://mlyixi.github.io/js/totop.js?v=0.0.0" async></script><script type=text/javascript src=//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js async></script></div><div id=secondary><section class=widget><form id=search action=https://mlyixi.github.io/search/ method=get accept-charset=utf-8 target=_blank _lpchecked=1><input type=text name=q maxlength=20 placeholder=Search>
+<input type=hidden name=sitesearch value=https://mlyixi.github.io/>
+<button type=submit class="submit icon-search"></button></form></section><section class=widget><h3 class=widget-title>最近文章</h3><ul class=widget-list><li><a href=https://mlyixi.github.io/post/cs/git%E7%AE%80%E6%98%93%E6%9C%8D%E5%8A%A1%E5%99%A8/ title=git简易服务器>git简易服务器</a></li><li><a href=https://mlyixi.github.io/post/network/dpi%E5%B7%A5%E5%85%B7%E6%AF%94%E8%BE%83/ title=DPI工具比较>DPI工具比较</a></li><li><a href=https://mlyixi.github.io/post/network/tinyfecVPN/ title=TinyfecVPN>TinyfecVPN</a></li><li><a href=https://mlyixi.github.io/post/linux/NFS%E6%9C%8D%E5%8A%A1%E5%99%A8/ title=NFS服务器>NFS服务器</a></li><li><a href=https://mlyixi.github.io/post/network/IOL_DHCP%E9%85%8D%E7%BD%AE/ title=IOL_DHCP配置>IOL_DHCP配置</a></li><li><a href=https://mlyixi.github.io/post/cs/mysql%E5%90%AF%E7%94%A8%E8%BF%9C%E7%A8%8B%E8%BF%9E%E6%8E%A5/ title=Mysql启用远程连接>Mysql启用远程连接</a></li><li><a href=https://mlyixi.github.io/post/network/security_onion%E4%B8%8EOSSIM%E6%AF%94%E8%BE%83/ title=Security_onion与OSSIM比较>Security_onion与OSSIM比较</a></li><li><a href=https://mlyixi.github.io/post/cs/%E4%BB%A3%E7%A0%81%E5%A4%A7%E5%85%A8/ title=代码大全>代码大全</a></li><li><a href=https://mlyixi.github.io/post/network/%E7%BD%91%E7%BB%9C%E7%A9%BA%E9%97%B4%E6%B5%8B%E7%BB%98%E6%8A%80%E6%9C%AF/ title=网络空间测绘技术>网络空间测绘技术</a></li><li><a href=https://mlyixi.github.io/post/network/%E8%A7%A3%E6%9E%90%E8%B6%85%E7%BA%A7%E8%99%9A%E6%8B%9F%E5%AE%9E%E9%AA%8C%E5%AE%A4eve-ng%E7%9A%84%E5%B7%A5%E4%BD%9C%E6%A8%A1%E5%BC%8F/ title="解析超级虚拟实验室eve Ng的工作模式">解析超级虚拟实验室eve Ng的工作模式</a></li></ul></section><section class=widget><h3 class=widget-title><a href=https://mlyixi.github.io/categories/>分类</a></h3><ul class=widget-list><li><a href=https://mlyixi.github.io/categories/CS/>CS (34)</a></li><li><a href=https://mlyixi.github.io/categories/Linux/>Linux (26)</a></li><li><a href=https://mlyixi.github.io/categories/ML/>ML (6)</a></li><li><a href=https://mlyixi.github.io/categories/OSX/>OSX (10)</a></li><li><a href=https://mlyixi.github.io/categories/math/>math (24)</a></li><li><a href=https://mlyixi.github.io/categories/network/>network (14)</a></li><li><a href=https://mlyixi.github.io/categories/signal/>signal (3)</a></li><li><a href=https://mlyixi.github.io/categories/social/>social (5)</a></li></ul></section><section class=widget><h3 class=widget-title><a href=https://mlyixi.github.io/tags/>标签</a></h3><div class=tagcloud><a href=https://mlyixi.github.io/tags/Archlinux/>Archlinux</a>
+<a href=https://mlyixi.github.io/tags/CodeSignBreak%E5%8F%91%E5%B8%83/>CodeSignBreak发布</a>
+<a href=https://mlyixi.github.io/tags/DHCP/>DHCP</a>
+<a href=https://mlyixi.github.io/tags/DPI/>DPI</a>
+<a href=https://mlyixi.github.io/tags/Doxygen/>Doxygen</a>
+<a href=https://mlyixi.github.io/tags/GAN/>GAN</a>
+<a href=https://mlyixi.github.io/tags/Graphviz/>Graphviz</a>
+<a href=https://mlyixi.github.io/tags/IOL/>IOL</a>
+<a href=https://mlyixi.github.io/tags/IPv6/>IPv6</a>
+<a href=https://mlyixi.github.io/tags/KDE/>KDE</a>
+<a href=https://mlyixi.github.io/tags/MAB/>MAB</a>
+<a href=https://mlyixi.github.io/tags/MATLAB/>MATLAB</a>
+<a href=https://mlyixi.github.io/tags/MathJax/>MathJax</a>
+<a href=https://mlyixi.github.io/tags/Mysql/>Mysql</a>
+<a href=https://mlyixi.github.io/tags/NFS/>NFS</a>
+<a href=https://mlyixi.github.io/tags/OSSIM/>OSSIM</a>
+<a href=https://mlyixi.github.io/tags/PATH/>PATH</a>
+<a href=https://mlyixi.github.io/tags/PRML/>PRML</a>
+<a href=https://mlyixi.github.io/tags/PT/>PT</a>
+<a href=https://mlyixi.github.io/tags/ProGit/>ProGit</a>
+<a href=https://mlyixi.github.io/tags/SecurityOnion/>SecurityOnion</a>
+<a href=https://mlyixi.github.io/tags/UEFI/>UEFI</a>
+<a href=https://mlyixi.github.io/tags/VPS/>VPS</a>
+<a href=https://mlyixi.github.io/tags/Windows/>Windows</a>
+<a href=https://mlyixi.github.io/tags/aircrack-ng/>aircrack-ng</a>
+<a href=https://mlyixi.github.io/tags/bash/>bash</a>
+<a href=https://mlyixi.github.io/tags/bind9/>bind9</a>
+<a href=https://mlyixi.github.io/tags/cmake/>cmake</a>
+<a href=https://mlyixi.github.io/tags/docker/>docker</a>
+<a href=https://mlyixi.github.io/tags/eve-ng/>eve-ng</a>
+<a href=https://mlyixi.github.io/tags/git/>git</a>
+<a href=https://mlyixi.github.io/tags/github/>github</a>
+<a href=https://mlyixi.github.io/tags/gnuradio/>gnuradio</a>
+<a href=https://mlyixi.github.io/tags/gpg/>gpg</a>
+<a href=https://mlyixi.github.io/tags/hackintosh/>hackintosh</a>
+<a href=https://mlyixi.github.io/tags/homebrew/>homebrew</a>
+<a href=https://mlyixi.github.io/tags/iOS/>iOS</a>
+<a href=https://mlyixi.github.io/tags/iproute/>iproute</a>
+<a href=https://mlyixi.github.io/tags/iptables/>iptables</a>
+<a href=https://mlyixi.github.io/tags/latex/>latex</a>
+<a href=https://mlyixi.github.io/tags/man/>man</a>
+<a href=https://mlyixi.github.io/tags/markdown/>markdown</a>
+<a href=https://mlyixi.github.io/tags/n2n/>n2n</a>
+<a href=https://mlyixi.github.io/tags/nc/>nc</a>
+<a href=https://mlyixi.github.io/tags/ntp/>ntp</a>
+<a href=https://mlyixi.github.io/tags/postgresql/>postgresql</a>
+<a href=https://mlyixi.github.io/tags/python/>python</a>
+<a href=https://mlyixi.github.io/tags/signal/>signal</a>
+<a href=https://mlyixi.github.io/tags/ubuntu/>ubuntu</a>
+<a href=https://mlyixi.github.io/tags/vim/>vim</a>
+<a href=https://mlyixi.github.io/tags/vpn/>vpn</a>
+<a href=https://mlyixi.github.io/tags/vscode/>vscode</a>
+<a href=https://mlyixi.github.io/tags/wireshark/>wireshark</a>
+<a href=https://mlyixi.github.io/tags/zsh/>zsh</a>
+<a href=https://mlyixi.github.io/tags/%E4%BA%A4%E6%8D%A2/>交换</a>
+<a href=https://mlyixi.github.io/tags/%E5%8F%A4%E5%85%B8%E8%87%AA%E7%94%B1%E4%B8%BB%E4%B9%89/>古典自由主义</a>
+<a href=https://mlyixi.github.io/tags/%E5%A4%9A%E7%BD%91%E5%8D%A1/>多网卡</a>
+<a href=https://mlyixi.github.io/tags/%E5%BC%80%E6%BA%90/>开源</a>
+<a href=https://mlyixi.github.io/tags/%E6%8A%A5%E6%96%87/>报文</a>
+<a href=https://mlyixi.github.io/tags/%E6%95%B0%E6%8D%AE%E5%8C%85/>数据包</a>
+<a href=https://mlyixi.github.io/tags/%E6%9D%82%E8%B0%88/>杂谈</a>
+<a href=https://mlyixi.github.io/tags/%E6%A6%82%E7%8E%87%E8%AE%BA/>概率论</a>
+<a href=https://mlyixi.github.io/tags/%E6%B5%8B%E7%BB%98/>测绘</a>
+<a href=https://mlyixi.github.io/tags/%E7%A1%AC%E7%9B%98/>硬盘</a>
+<a href=https://mlyixi.github.io/tags/%E7%BD%91%E5%85%B3/>网关</a>
+<a href=https://mlyixi.github.io/tags/%E8%BD%AF%E4%BB%B6/>软件</a></div></section><section class=widget><h3 class=widget-title>其它</h3><ul class=widget-list><li><a href=https://mlyixi.github.io/index.xml>文章 RSS</a></li></ul></section></div></div></div></div></body></html>

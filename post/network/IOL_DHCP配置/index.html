@@ -1,0 +1,189 @@
+<!doctype html><html lang=zh-cn><head><meta charset=utf-8><meta http-equiv=x-ua-compatible content="IE=edge"><meta name=viewport content="width=device-width,initial-scale=1"><meta name=referrer content="no-referrer-when-downgrade"><title>IOL_DHCP配置 | mlyixi的博客</title><meta property="og:title" content="IOL_DHCP配置 - mlyixi的博客"><meta property="og:type" content="article"><meta property="article:published_time" content="2021-01-11T14:34:15+08:00"><meta property="article:modified_time" content="2021-01-11T14:34:15+08:00"><meta name=Keywords content="学习、研究、工作"><meta name=description content="IOL_DHCP配置"><meta name=author content="mlyixi"><meta property="og:url" content="https://mlyixi.github.io/post/network/IOL_DHCP%E9%85%8D%E7%BD%AE/"><link rel="shortcut icon" href=https://mlyixi.github.io/favicon.ico type=image/x-icon><link rel=stylesheet href=https://mlyixi.github.io/css/normalize.css><link rel=stylesheet href=https://mlyixi.github.io/css/style.css><script type=text/javascript src=//cdn.bootcdn.net/ajax/libs/jquery/3.4.1/jquery.min.js></script><link href=https://cdn.bootcdn.net/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css rel=stylesheet></head><body><header id=header class=clearfix><div class=container><div class=col-group><div class=site-name><a id=logo href=https://mlyixi.github.io/>mlyixi的博客</a><p class=description>欲望的唤醒，信仰的坚定</p></div><div><nav id=nav-menu class=clearfix><a class=current href=https://mlyixi.github.io/>首页</a>
+<a href=https://mlyixi.github.io/tools/ title=工具>工具</a>
+<a href=https://mlyixi.github.io/archives/ title=归档>归档</a>
+<a href=https://mlyixi.github.io/about/ title=关于>关于</a></nav></div></div></div></header><div id=body><div class=container><div class=col-group><div class=col-8 id=main><div class=res-cons><style type=text/css>.post-toc{position:fixed;width:200px;margin-left:-210px;padding:5px 10px;font-family:Athelas,STHeiti,Microsoft Yahei,serif;font-size:12px;border:1px solid rgba(0,0,0,.07);border-radius:5px;background-color:rgba(255,255,255,.98);background-clip:padding-box;-webkit-box-shadow:1px 1px 2px rgba(0,0,0,.125);box-shadow:1px 1px 2px rgba(0,0,0,.125);word-wrap:break-word;white-space:nowrap;-webkit-box-sizing:border-box;box-sizing:border-box;z-index:999;cursor:pointer;max-height:70%;overflow-y:auto;overflow-x:hidden}.post-toc .post-toc-title{width:100%;margin:0 auto;font-size:20px;font-weight:400;text-transform:uppercase;text-align:center}.post-toc .post-toc-content{font-size:15px}.post-toc .post-toc-content>nav>ul{margin:10px 0}.post-toc .post-toc-content ul{padding-left:20px;list-style:square;margin:.5em;line-height:1.8em}.post-toc .post-toc-content ul ul{padding-left:15px;display:none}@media print,screen and (max-width:1057px){.post-toc{display:none}}</style><div class=post-toc style=position:absolute;top:188px><h2 class=post-toc-title>文章目录</h2><div class=post-toc-content><nav id=TableOfContents><ul><li><a href=#早期概念>早期概念</a></li></ul><ul><li><a href=#dhcpv6-有状态分析拓扑>DHCPv6 有状态分析拓扑</a></li></ul></nav></div></div><script type=text/javascript>$(document).ready(function(){var postToc=$(".post-toc");if(postToc.length){var leftPos=$("#main").offset().left;if(leftPos<220){postToc.css({"width":leftPos-10,"margin-left":(0-leftPos)})}
+var t=postToc.offset().top-20,a={start:{position:"absolute",top:t},process:{position:"fixed",top:20},};$(window).scroll(function(){var e=$(window).scrollTop();e<t?postToc.css(a.start):postToc.css(a.process)})}})</script><article class=post><header><h1 class=post-title>IOL_DHCP配置</h1></header><date class="post-meta meta-date">2021年1月11日</date><div class=post-meta><span>|</span>
+<span class=meta-category><a href=https://mlyixi.github.io/categories/network>network</a></span>
+<span class=meta-category><a href=https://mlyixi.github.io/categories/Linux>Linux</a></span></div><div class=post-meta><span id=busuanzi_container_page_pv>|<span id=busuanzi_value_page_pv></span><span>
+阅读</span></span></div><div class=clear style=display:none><div class=toc-article><div class=toc-title>文章目录</div></div></div><div class=post-content><h1 id=初始化设置>初始化设置</h1><p>刚进入系统会要求设置密码和管理端口，按提示操作即可。</p><h1 id=配置网络接口>配置网络接口</h1><div class=highlight><div style=color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><table style=border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block><tr><td style=vertical-align:top;padding:0;margin:0;border:0><pre style=color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="margin-right:.4em;padding:0 .4em;color:#495050"> 1
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050"> 2
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050"> 3
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050"> 4
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050"> 5
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050"> 6
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050"> 7
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050"> 8
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050"> 9
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050">10
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050">11
+</span></code></pre></td><td style=vertical-align:top;padding:0;margin:0;border:0;width:100%><pre style=color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-zsh data-lang=zsh>Router&gt; <span style=color:#b58900>enable</span>
+Router# configure terminal
+Router<span style=color:#719e07>(</span>config<span style=color:#719e07>)</span><span style=color:#586e75># hostname Router</span>
+Router<span style=color:#719e07>(</span>config<span style=color:#719e07>)</span><span style=color:#586e75># enable secret eve</span>
+Router<span style=color:#719e07>(</span>config<span style=color:#719e07>)</span><span style=color:#586e75># no ip domain-lookup</span>
+
+Router<span style=color:#719e07>(</span>config<span style=color:#719e07>)</span><span style=color:#586e75># interface ethernet 0/1 #这里接口名可能不同，按?查询。</span>
+Router<span style=color:#719e07>(</span>config-if<span style=color:#719e07>)</span><span style=color:#586e75># ip address 192.168.5.1 255.255.255.0</span>
+Router<span style=color:#719e07>(</span>config-if<span style=color:#719e07>)</span><span style=color:#586e75># no shutdown</span>
+Router<span style=color:#719e07>(</span>config-if<span style=color:#719e07>)</span><span style=color:#586e75># end</span>
+Router# write
+</code></pre></td></tr></table></div></div><h1 id=查看网络接口>查看网络接口</h1><div class=highlight><div style=color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><table style=border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block><tr><td style=vertical-align:top;padding:0;margin:0;border:0><pre style=color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="margin-right:.4em;padding:0 .4em;color:#495050">1
+</span></code></pre></td><td style=vertical-align:top;padding:0;margin:0;border:0;width:100%><pre style=color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-zsh data-lang=zsh>Router# show interfaces
+</code></pre></td></tr></table></div></div><h1 id=dhcp-server>DHCP Server</h1><div class=highlight><div style=color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><table style=border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block><tr><td style=vertical-align:top;padding:0;margin:0;border:0><pre style=color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="margin-right:.4em;padding:0 .4em;color:#495050"> 1
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050"> 2
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050"> 3
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050"> 4
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050"> 5
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050"> 6
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050"> 7
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050"> 8
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050"> 9
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050">10
+</span></code></pre></td><td style=vertical-align:top;padding:0;margin:0;border:0;width:100%><pre style=color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-zsh data-lang=zsh>dhcp# configure terminal
+dhcp<span style=color:#719e07>(</span>config<span style=color:#719e07>)</span><span style=color:#586e75># service dhcp</span>
+dhcp<span style=color:#719e07>(</span>config<span style=color:#719e07>)</span><span style=color:#586e75># ip dhcp excluded-address 192.168.5.1 192.168.5.100  //配置dhcp不分配的地址 </span>
+dhcp<span style=color:#719e07>(</span>config<span style=color:#719e07>)</span><span style=color:#586e75>#ip dhcp pool e01</span>
+dhcp<span style=color:#719e07>(</span>dhcp-config<span style=color:#719e07>)</span><span style=color:#586e75>#network 192.168.5.0 255.255.255.0  </span>
+dhcp<span style=color:#719e07>(</span>dhcp-config<span style=color:#719e07>)</span><span style=color:#586e75># default-router 192.168.5.1 </span>
+dhcp<span style=color:#719e07>(</span>dhcp-config<span style=color:#719e07>)</span><span style=color:#586e75>#dns-server 192.168.5.1</span>
+dhcp<span style=color:#719e07>(</span>dhcp-config<span style=color:#719e07>)</span><span style=color:#586e75># lease 3</span>
+dhcp<span style=color:#719e07>(</span>dhcp-config<span style=color:#719e07>)</span><span style=color:#586e75># end</span>
+dhcp# write
+</code></pre></td></tr></table></div></div><div class=highlight><div style=color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><table style=border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block><tr><td style=vertical-align:top;padding:0;margin:0;border:0><pre style=color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="margin-right:.4em;padding:0 .4em;color:#495050">1
+</span></code></pre></td><td style=vertical-align:top;padding:0;margin:0;border:0;width:100%><pre style=color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-zsh data-lang=zsh>dhcp# show ip dhcp binding
+</code></pre></td></tr></table></div></div><h1 id=dns-server>DNS Server</h1><div class=highlight><div style=color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><table style=border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block><tr><td style=vertical-align:top;padding:0;margin:0;border:0><pre style=color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="margin-right:.4em;padding:0 .4em;color:#495050">1
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050">2
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050">3
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050">4
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050">5
+</span></code></pre></td><td style=vertical-align:top;padding:0;margin:0;border:0;width:100%><pre style=color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-zsh data-lang=zsh>Router<span style=color:#719e07>(</span>config<span style=color:#719e07>)</span><span style=color:#586e75># ip dns server</span>
+Router<span style=color:#719e07>(</span>config<span style=color:#719e07>)</span><span style=color:#586e75># ip domain-lookup</span>
+Router<span style=color:#719e07>(</span>config<span style=color:#719e07>)</span><span style=color:#586e75># ip name-server 8.8.8.8</span>
+Router<span style=color:#719e07>(</span>config<span style=color:#719e07>)</span><span style=color:#586e75># ip host 10.1.1.1</span>
+Router# clear hosts *
+</code></pre></td></tr></table></div></div><h1 id=slaac>SLAAC</h1><div class=highlight><div style=color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><table style=border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block><tr><td style=vertical-align:top;padding:0;margin:0;border:0><pre style=color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="margin-right:.4em;padding:0 .4em;color:#495050">1
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050">2
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050">3
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050">4
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050">5
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050">6
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050">7
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050">8
+</span></code></pre></td><td style=vertical-align:top;padding:0;margin:0;border:0;width:100%><pre style=color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-zsh data-lang=zsh>Router<span style=color:#719e07>(</span>config<span style=color:#719e07>)</span><span style=color:#586e75># ipv6 unicast-routing</span>
+Router<span style=color:#719e07>(</span>config<span style=color:#719e07>)</span><span style=color:#586e75># interface ethernet 0/1</span>
+Router<span style=color:#719e07>(</span>config-if<span style=color:#719e07>)</span><span style=color:#586e75># description IPv6-SLAAC</span>
+Router<span style=color:#719e07>(</span>config-if<span style=color:#719e07>)</span><span style=color:#586e75># ipv6 address 2048:5:5:5::1/64</span>
+Router<span style=color:#719e07>(</span>config-if<span style=color:#719e07>)</span><span style=color:#586e75># ipv6 address FE80::1 link-local</span>
+Router<span style=color:#719e07>(</span>config-if<span style=color:#719e07>)</span><span style=color:#586e75># ipv6 enable</span>
+Router<span style=color:#719e07>(</span>config-if<span style=color:#719e07>)</span><span style=color:#586e75># end</span>
+Router# write
+</code></pre></td></tr></table></div></div><h1 id=dhcp-v6-server>DHCP V6 Server</h1><h2 id=早期概念>早期概念</h2><p>众所周知，在有关网络的研究中，我们从 IPv4 协议开始。我们了解设备上的静态 IP 寻址，然后了解主机上使用 DHCP 协议的动态 IP 寻址。现在在 IPv6 网络中，全局单播地址可以手动或动态配置。但是，对于 IPv6 网络，我们有两种动态分配方法：</p><ul><li><p>无状态地址自动配置 (SLAAC)</p></li><li><p>IPv6 的动态主机配置协议 (DHCPv6)</p></li></ul><p>如果简单概括 SLAAC，它是指主机无需 DHCPv6 服务器即可获得 IPv6 全局单播地址的一种方法。SLAAC 的基础在于 ICMPv6，它比 IPv4 的 ICMP 更加可靠。基本上，SLAAC 使用以下 ICMPv6 消息来提供 IPv6 寻址：</p><ul><li><p>路由器请求报文 (RS)：当客户端被配置通过 SLAAC 自动获取其寻址信息时，它将向路由器发送 RS 消息。该消息发送到所有 IPv6 路由器 FF02::2 的多播地址。这是 ICMPv6 消息类型 133。</p></li><li><p>路由器通告报文 (RA)：路由器发送 RA 消息以向客户端提供 IPv6 寻址信息。该消息包括前缀和局部段的前缀长度。路由器会定期（可在 4~1800 秒范围内配置）发送 RA 消息，或为响应 RS 消息而发送 RA 消息。默认情况下，思科路由器每 200 秒发送一次 RA 消息。RA 消息始终发送到所有 IPv6 节点 FF02::1 的多播地址。这是 ICMPv6 消息类型 134。</p></li></ul><p><figure class="max-w-2xl mx-auto overflow-hidden"><a data-fancybox=gallery href=https://mlyixi.github.io/network/rs_ra.jpeg><img alt=image src=https://mlyixi.github.io/network/rs_ra.jpeg></a><figcaption class="p-2 text-center">RS和RA消息</figcaption></figure></p><p>顾名思义，SLAAC 是一种无状态服务。这意味着没有服务器维护网络地址信息。它还不知道正在使用哪些 IPv6 地址以及哪些可用。而这正是 DHCPv6 发挥作用的时候。关于客户端如何能够自动获取 IPv6 寻址信息的决定将取决于 RA 消息中确定的信息。为此，我们将使用两个标志，即受管地址配置标志（M 标志）和其他配置标志（O 标志）。</p><p>通过使用 M 和 O 标志的不同组合，RA 消息确定以下三个寻址选项之一：</p><ul><li><p>SLAAC（仅使用 RA 消息）</p></li><li><p>DHCPv6 无状态（RA 和 DHCPv6 消息）</p></li><li><p>DHCPv6 有状态（仅使用 DHCPv6 消息）</p></li></ul><p>请注意，尽管 RA 消息定义了客户端如何动态获取 IPv6 地址，但是客户端的操作系统可以选择忽略 RA 消息，而仅使用 DHCPv6 服务器的服务。</p><p>SLAAC 是思科路由器上的默认选项。RA 消息中的 M 标志和 O 标志都设置为 0（位）。在客户端上，IPv6 全局单播地址的创建方式是 RA 消息提供的前缀加上使用 EUI-64 的接口 ID，或加上装有 Windows 操作系统的 PC 中出现的随机生成值。</p><p>如果先前对设备中的 M 和 O 标志进行了修改，我们可以在接口模式下通过以下配置将接口重置为仅通过 SLAAC 工作：</p><div class=highlight><div style=color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><table style=border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block><tr><td style=vertical-align:top;padding:0;margin:0;border:0><pre style=color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="margin-right:.4em;padding:0 .4em;color:#495050">1
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050">2
+</span></code></pre></td><td style=vertical-align:top;padding:0;margin:0;border:0;width:100%><pre style=color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-zsh data-lang=zsh>Router <span style=color:#719e07>(</span>config-if<span style=color:#719e07>)</span> <span style=color:#586e75># no ipv6 nd managed-config-flag</span>
+Router <span style=color:#719e07>(</span>config-if<span style=color:#719e07>)</span> <span style=color:#586e75># no ipv6 nd other-config-flag</span>
+</code></pre></td></tr></table></div></div><h1 id=dhcpv6-无状态>DHCPv6 无状态</h1><p>DHCPv6 无状态选项通知客户端使用 RA 消息中的信息来获取 IPv6 寻址，但是 DHCPv6 服务器中提供其他配置参数。（例如，DNS 服务器的 IPv6 地址）。使用该名称进行定义是因为 DHCPv6 服务器不维护任何客户端状态信息（例如可用和已分配的 IPv6 地址的列表）。</p><p>对于 DHCPv6 无状态，O 标志设置为 1（位），M 标志保留为默认设置 0（位）。O 标志为 1 可通知客户端可以从 DHCPv6 服务器获得其他配置信息。</p><p>要修改从路由器接口发送的 RA 消息以指示 DHCPv6 无状态，请使用以下命令：</p><div class=highlight><div style=color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><table style=border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block><tr><td style=vertical-align:top;padding:0;margin:0;border:0><pre style=color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="margin-right:.4em;padding:0 .4em;color:#495050">1
+</span></code></pre></td><td style=vertical-align:top;padding:0;margin:0;border:0;width:100%><pre style=color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-zsh data-lang=zsh>Router <span style=color:#719e07>(</span>config-if<span style=color:#719e07>)</span> <span style=color:#586e75># ipv6 nd other-config-flag</span>
+</code></pre></td></tr></table></div></div><h1 id=dhcpv6-有状态>DHCPv6 有状态</h1><p>此选项与我们在 IPv4 网络中研究的 DHCP 最相似。在这种情况下，RA 消息会通知客户不应使用其消息信息，并且必须从 DHCPv6 有状态服务器获取所有 IPv6 寻址信息和其他配置参数。因为 DHCPv6 服务器维护 IPv6 状态信息，所以使用此名称进行定义。（例如，分配的 IPv6 地址列表）</p><p>M 标志指示是否应使用 DHCPv6 有状态。这里不使用 O 标志，可以忽略。以下命令用于将 M 标志从 0 更改为 1，以指示 DHCPv6 有状态：</p><div class=highlight><div style=color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><table style=border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block><tr><td style=vertical-align:top;padding:0;margin:0;border:0><pre style=color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="margin-right:.4em;padding:0 .4em;color:#495050">1
+</span></code></pre></td><td style=vertical-align:top;padding:0;margin:0;border:0;width:100%><pre style=color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-zsh data-lang=zsh>Router <span style=color:#719e07>(</span>config-if<span style=color:#719e07>)</span> <span style=color:#586e75># ipv6 nd managed-config-flag</span>
+</code></pre></td></tr></table></div></div><p>DHCPV6 - 其他特征：</p><ul><li><p>DHCPv6 具有 4 路协商过程。使用以下消息：</p><ul><li><p>请求：客户端使用多播地址 FF02::1:2 发送此消息以查找 DHCPv6 服务器，该地址是所有 DHCPv6 服务器的多播地址。</p></li><li><p>通告：服务器用通告消息（单播）响应请求消息，以向客户端提供寻址信息。</p></li><li><p>请求：客户端将此消息发送到服务器，以确认提供的地址和任何其他参数。</p></li><li><p>应答：服务器以该消息结束该过程，该消息包含分配的 IPv6 地址和相应的配置参数。</p></li></ul></li><li><p>DHCPv6 服务器使用 UDP 端口 547，DHCPv6 客户端使用 UDP 端口 546</p></li><li><p>DHCPv6 可以以两种形式实现：</p><ul><li><p>快速提交：DHCP 客户端通过快速交换两条消息（征求和应答）从服务器获取配置参数。</p></li><li><p>正常提交：DHCP 客户端交换四条消息（征求、通告、请求和应答）。</p></li><li><p>默认情况下，使用正常提交。</p></li></ul></li><li><p>综上所述，DHCPv4 和 DHCPv6 之间的消息对比如下：<figure class="max-w-2xl mx-auto overflow-hidden"><a data-fancybox=gallery href=https://mlyixi.github.io/network/dhcp46.jpeg><img alt=image src=https://mlyixi.github.io/network/dhcp46.jpeg></a><figcaption class="p-2 text-center">DHCPv4和DHCPv6消息类型</figcaption></figure></p></li></ul><p><figure class="max-w-2xl mx-auto overflow-hidden"><a data-fancybox=gallery href=https://mlyixi.github.io/network/dhcp_options.jpeg><img alt=image src=https://mlyixi.github.io/network/dhcp_options.jpeg></a><figcaption class="p-2 text-center">DHCPv6消息参数</figcaption></figure></p><h2 id=dhcpv6-有状态分析拓扑>DHCPv6 有状态分析拓扑</h2><p>在此示例中，我们使用的是带有路由器和真实 PC 的以下拓扑。请注意，路由器 R1 上需要“IPv6 unicast-routing”命令，因为需要发送 ICMPv6 RA 消息。</p><p><figure class="max-w-2xl mx-auto overflow-hidden"><a data-fancybox=gallery href=https://mlyixi.github.io/network/dhcp_stateful.jpeg><img alt=image src=https://mlyixi.github.io/network/dhcp_stateful.jpeg></a><figcaption class="p-2 text-center">DHCPv6 RA有状态</figcaption></figure></p><div class=highlight><div style=color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><table style=border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block><tr><td style=vertical-align:top;padding:0;margin:0;border:0><pre style=color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="margin-right:.4em;padding:0 .4em;color:#495050"> 1
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050"> 2
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050"> 3
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050"> 4
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050"> 5
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050"> 6
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050"> 7
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050"> 8
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050"> 9
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050">10
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050">11
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050">12
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050">13
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050">14
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050">15
+</span></code></pre></td><td style=vertical-align:top;padding:0;margin:0;border:0;width:100%><pre style=color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-zsh data-lang=zsh>Device# configure terminal
+Device<span style=color:#719e07>(</span>config<span style=color:#719e07>)</span><span style=color:#586e75># ipv6 unicast-routing</span>
+Device<span style=color:#719e07>(</span>config<span style=color:#719e07>)</span><span style=color:#586e75># ipv6 dhcp pool LAN1</span>
+Device<span style=color:#719e07>(</span>config-dhcpv6<span style=color:#719e07>)</span><span style=color:#586e75># address prefix 2001:2:2:2::/64 lifetime infinite 86400</span>
+Device<span style=color:#719e07>(</span>config-dhcpv6<span style=color:#719e07>)</span><span style=color:#586e75># dns-server 2001:2:2:2::1</span>
+Device<span style=color:#719e07>(</span>config-dhcpv6<span style=color:#719e07>)</span><span style=color:#586e75># domain-name example.com</span>
+Device<span style=color:#719e07>(</span>config-dhcpv6<span style=color:#719e07>)</span><span style=color:#586e75># exit</span>
+Device<span style=color:#719e07>(</span>config<span style=color:#719e07>)</span><span style=color:#586e75># interface g1</span>
+Device<span style=color:#719e07>(</span>config<span style=color:#719e07>)</span><span style=color:#586e75># ipv6 address 2001:2:2:2::1/64</span>
+Device<span style=color:#719e07>(</span>config<span style=color:#719e07>)</span><span style=color:#586e75># ipv6 address FE80::1 link-local</span>
+Device<span style=color:#719e07>(</span>config<span style=color:#719e07>)</span><span style=color:#586e75># ipv6 dhcp server LAN1</span>
+Device<span style=color:#719e07>(</span>config<span style=color:#719e07>)</span><span style=color:#586e75># ipv6 nd managed-config-flag</span>
+Device<span style=color:#719e07>(</span>config<span style=color:#719e07>)</span><span style=color:#586e75># no shutdown</span>
+Device<span style=color:#719e07>(</span>config<span style=color:#719e07>)</span><span style=color:#586e75># end</span>
+Device# write
+</code></pre></td></tr></table></div></div><p>请注意，在我们的 DHCPv6 池配置中，未指定默认网关，就像使用“default-router”命令的 IPv4 示例一样。这是因为路由器通过我们在拓扑中所看到的 RA 消息自动将其自己的本地链接地址 (FE80::1) 作为默认网关发送。</p><p>在下面的“show”命令中可以看到，第一个位置处显示的是 DHCPv6 池的名称，第二个位置处显示已配置的参数，我们并没有看到任何输出，因为没有已收到 IPv6 地址的 DHCPv6 客户端。</p><div class=highlight><div style=color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><table style=border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block><tr><td style=vertical-align:top;padding:0;margin:0;border:0><pre style=color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="margin-right:.4em;padding:0 .4em;color:#495050">1
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050">2
+</span></code></pre></td><td style=vertical-align:top;padding:0;margin:0;border:0;width:100%><pre style=color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-zsh data-lang=zsh>Device# show ipv6 dhcp pool
+Device# show ipv6 dhp binding
+</code></pre></td></tr></table></div></div><p>DHCPv6 使用 DHCPv6 唯一标识符 (DUID) 来识别 DHCPv6 客户端和服务器。每个客户端只有一个 DUID，并且每个服务器也只有一个 DIUD。</p><p>在这个示例中，我们还看到其他“show”命令，其中显示有 DHCPv6 服务器的 DUID 以及 M 标志设为 1 的效果，M 标志设为 1 指示主机必须使用 DHCPv6 来获得具有可路由地址特征的全局单播 IPv6 地址。</p><p>Windows 系统 PC 默认情况下会生成一个随机的接口 ID 值，用于使用 SLAAC（而非 EUI-64）方法自动配置 IPv6。但是，我们可以使用以下命令在管理员模式下通过 Windows CMD 禁用：“netsh interface ipv6 set global randomizeidentifiers=disabled”</p><p><a href=http://sd.ourvip.net>http://sd.ourvip.net</a>:7000/CCNARoutingandSwitchingEssentials/course/module10/index.html#10.2.1.2</p><p><a href=http://sd.ourvip.net>http://sd.ourvip.net</a>:7000/</p></div><div class=post-archive><ul class=post-copyright><li><strong>原文作者：</strong><a rel=author href=https://mlyixi.github.io/>mlyixi</a></li><li style=word-break:break-all><strong>原文链接：</strong><a href=https://mlyixi.github.io/post/network/IOL_DHCP%E9%85%8D%E7%BD%AE/>https://mlyixi.github.io/post/network/IOL_DHCP%E9%85%8D%E7%BD%AE/</a></li><li><strong>版权声明：</strong>本作品采用<a rel=license href=https://creativecommons.org/licenses/by-nc-nd/4.0/>知识共享署名-非商业性使用-禁止演绎 4.0 国际许可协议</a>进行许可，非商业转载请注明出处（作者，原文链接），商业转载请联系作者获得授权。</li></ul></div><br><div class=post-archive><h2>See Also</h2><ul class=listing><li><a href=https://mlyixi.github.io/post/cs/mysql%E5%90%AF%E7%94%A8%E8%BF%9C%E7%A8%8B%E8%BF%9E%E6%8E%A5/>Mysql启用远程连接</a></li><li><a href=https://mlyixi.github.io/post/network/security_onion%E4%B8%8EOSSIM%E6%AF%94%E8%BE%83/>Security_onion与OSSIM比较</a></li><li><a href=https://mlyixi.github.io/post/cs/%E4%BB%A3%E7%A0%81%E5%A4%A7%E5%85%A8/>代码大全</a></li><li><a href=https://mlyixi.github.io/post/network/%E7%BD%91%E7%BB%9C%E7%A9%BA%E9%97%B4%E6%B5%8B%E7%BB%98%E6%8A%80%E6%9C%AF/>网络空间测绘技术</a></li><li><a href=https://mlyixi.github.io/post/network/%E8%A7%A3%E6%9E%90%E8%B6%85%E7%BA%A7%E8%99%9A%E6%8B%9F%E5%AE%9E%E9%AA%8C%E5%AE%A4eve-ng%E7%9A%84%E5%B7%A5%E4%BD%9C%E6%A8%A1%E5%BC%8F/>解析超级虚拟实验室eve Ng的工作模式</a></li></ul></div><div class="post-meta meta-tags"><ul class=clearfix><li><a href=https://mlyixi.github.io/tags/IOL>IOL</a></li><li><a href=https://mlyixi.github.io/tags/DHCP>DHCP</a></li></ul></div></article></div><footer id=footer><div>&copy; 2021 <a href=https://mlyixi.github.io/>mlyixi的博客 By mlyixi</a></div><br><div><div class=github-badge><a href=https://gohugo.io/ target=_black rel=nofollow><span class=badge-subject>Powered by</span><span class="badge-value bg-blue">Hugo</span></a></div><div class=github-badge><a href=https://www.flysnow.org/ target=_black><span class=badge-subject>Design by</span><span class="badge-value bg-brightgreen">飞雪无情</span></a></div><div class=github-badge><a href=https://github.com/flysnow-org/maupassant-hugo target=_black><span class=badge-subject>Theme</span><span class="badge-value bg-yellowgreen">Maupassant</span></a></div></div></footer><script type=text/javascript>window.MathJax={tex2jax:{inlineMath:[['$','$']],processEscapes:true}};</script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML" async></script><script src=https://cdn.bootcdn.net/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js></script><a id=rocket href=#top></a><script type=text/javascript src="https://mlyixi.github.io/js/totop.js?v=0.0.0" async></script><script type=text/javascript src=//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js async></script></div><div id=secondary><section class=widget><form id=search action=https://mlyixi.github.io/search/ method=get accept-charset=utf-8 target=_blank _lpchecked=1><input type=text name=q maxlength=20 placeholder=Search>
+<input type=hidden name=sitesearch value=https://mlyixi.github.io/>
+<button type=submit class="submit icon-search"></button></form></section><section class=widget><h3 class=widget-title>最近文章</h3><ul class=widget-list><li><a href=https://mlyixi.github.io/post/cs/git%E7%AE%80%E6%98%93%E6%9C%8D%E5%8A%A1%E5%99%A8/ title=git简易服务器>git简易服务器</a></li><li><a href=https://mlyixi.github.io/post/network/dpi%E5%B7%A5%E5%85%B7%E6%AF%94%E8%BE%83/ title=DPI工具比较>DPI工具比较</a></li><li><a href=https://mlyixi.github.io/post/network/tinyfecVPN/ title=TinyfecVPN>TinyfecVPN</a></li><li><a href=https://mlyixi.github.io/post/linux/NFS%E6%9C%8D%E5%8A%A1%E5%99%A8/ title=NFS服务器>NFS服务器</a></li><li><a href=https://mlyixi.github.io/post/network/IOL_DHCP%E9%85%8D%E7%BD%AE/ title=IOL_DHCP配置>IOL_DHCP配置</a></li><li><a href=https://mlyixi.github.io/post/cs/mysql%E5%90%AF%E7%94%A8%E8%BF%9C%E7%A8%8B%E8%BF%9E%E6%8E%A5/ title=Mysql启用远程连接>Mysql启用远程连接</a></li><li><a href=https://mlyixi.github.io/post/network/security_onion%E4%B8%8EOSSIM%E6%AF%94%E8%BE%83/ title=Security_onion与OSSIM比较>Security_onion与OSSIM比较</a></li><li><a href=https://mlyixi.github.io/post/cs/%E4%BB%A3%E7%A0%81%E5%A4%A7%E5%85%A8/ title=代码大全>代码大全</a></li><li><a href=https://mlyixi.github.io/post/network/%E7%BD%91%E7%BB%9C%E7%A9%BA%E9%97%B4%E6%B5%8B%E7%BB%98%E6%8A%80%E6%9C%AF/ title=网络空间测绘技术>网络空间测绘技术</a></li><li><a href=https://mlyixi.github.io/post/network/%E8%A7%A3%E6%9E%90%E8%B6%85%E7%BA%A7%E8%99%9A%E6%8B%9F%E5%AE%9E%E9%AA%8C%E5%AE%A4eve-ng%E7%9A%84%E5%B7%A5%E4%BD%9C%E6%A8%A1%E5%BC%8F/ title="解析超级虚拟实验室eve Ng的工作模式">解析超级虚拟实验室eve Ng的工作模式</a></li></ul></section><section class=widget><h3 class=widget-title><a href=https://mlyixi.github.io/categories/>分类</a></h3><ul class=widget-list><li><a href=https://mlyixi.github.io/categories/CS/>CS (34)</a></li><li><a href=https://mlyixi.github.io/categories/Linux/>Linux (26)</a></li><li><a href=https://mlyixi.github.io/categories/ML/>ML (6)</a></li><li><a href=https://mlyixi.github.io/categories/OSX/>OSX (10)</a></li><li><a href=https://mlyixi.github.io/categories/math/>math (24)</a></li><li><a href=https://mlyixi.github.io/categories/network/>network (14)</a></li><li><a href=https://mlyixi.github.io/categories/signal/>signal (3)</a></li><li><a href=https://mlyixi.github.io/categories/social/>social (5)</a></li></ul></section><section class=widget><h3 class=widget-title><a href=https://mlyixi.github.io/tags/>标签</a></h3><div class=tagcloud><a href=https://mlyixi.github.io/tags/Archlinux/>Archlinux</a>
+<a href=https://mlyixi.github.io/tags/CodeSignBreak%E5%8F%91%E5%B8%83/>CodeSignBreak发布</a>
+<a href=https://mlyixi.github.io/tags/DHCP/>DHCP</a>
+<a href=https://mlyixi.github.io/tags/DPI/>DPI</a>
+<a href=https://mlyixi.github.io/tags/Doxygen/>Doxygen</a>
+<a href=https://mlyixi.github.io/tags/GAN/>GAN</a>
+<a href=https://mlyixi.github.io/tags/Graphviz/>Graphviz</a>
+<a href=https://mlyixi.github.io/tags/IOL/>IOL</a>
+<a href=https://mlyixi.github.io/tags/IPv6/>IPv6</a>
+<a href=https://mlyixi.github.io/tags/KDE/>KDE</a>
+<a href=https://mlyixi.github.io/tags/MAB/>MAB</a>
+<a href=https://mlyixi.github.io/tags/MATLAB/>MATLAB</a>
+<a href=https://mlyixi.github.io/tags/MathJax/>MathJax</a>
+<a href=https://mlyixi.github.io/tags/Mysql/>Mysql</a>
+<a href=https://mlyixi.github.io/tags/NFS/>NFS</a>
+<a href=https://mlyixi.github.io/tags/OSSIM/>OSSIM</a>
+<a href=https://mlyixi.github.io/tags/PATH/>PATH</a>
+<a href=https://mlyixi.github.io/tags/PRML/>PRML</a>
+<a href=https://mlyixi.github.io/tags/PT/>PT</a>
+<a href=https://mlyixi.github.io/tags/ProGit/>ProGit</a>
+<a href=https://mlyixi.github.io/tags/SecurityOnion/>SecurityOnion</a>
+<a href=https://mlyixi.github.io/tags/UEFI/>UEFI</a>
+<a href=https://mlyixi.github.io/tags/VPS/>VPS</a>
+<a href=https://mlyixi.github.io/tags/Windows/>Windows</a>
+<a href=https://mlyixi.github.io/tags/aircrack-ng/>aircrack-ng</a>
+<a href=https://mlyixi.github.io/tags/bash/>bash</a>
+<a href=https://mlyixi.github.io/tags/bind9/>bind9</a>
+<a href=https://mlyixi.github.io/tags/cmake/>cmake</a>
+<a href=https://mlyixi.github.io/tags/docker/>docker</a>
+<a href=https://mlyixi.github.io/tags/eve-ng/>eve-ng</a>
+<a href=https://mlyixi.github.io/tags/git/>git</a>
+<a href=https://mlyixi.github.io/tags/github/>github</a>
+<a href=https://mlyixi.github.io/tags/gnuradio/>gnuradio</a>
+<a href=https://mlyixi.github.io/tags/gpg/>gpg</a>
+<a href=https://mlyixi.github.io/tags/hackintosh/>hackintosh</a>
+<a href=https://mlyixi.github.io/tags/homebrew/>homebrew</a>
+<a href=https://mlyixi.github.io/tags/iOS/>iOS</a>
+<a href=https://mlyixi.github.io/tags/iproute/>iproute</a>
+<a href=https://mlyixi.github.io/tags/iptables/>iptables</a>
+<a href=https://mlyixi.github.io/tags/latex/>latex</a>
+<a href=https://mlyixi.github.io/tags/man/>man</a>
+<a href=https://mlyixi.github.io/tags/markdown/>markdown</a>
+<a href=https://mlyixi.github.io/tags/n2n/>n2n</a>
+<a href=https://mlyixi.github.io/tags/nc/>nc</a>
+<a href=https://mlyixi.github.io/tags/ntp/>ntp</a>
+<a href=https://mlyixi.github.io/tags/postgresql/>postgresql</a>
+<a href=https://mlyixi.github.io/tags/python/>python</a>
+<a href=https://mlyixi.github.io/tags/signal/>signal</a>
+<a href=https://mlyixi.github.io/tags/ubuntu/>ubuntu</a>
+<a href=https://mlyixi.github.io/tags/vim/>vim</a>
+<a href=https://mlyixi.github.io/tags/vpn/>vpn</a>
+<a href=https://mlyixi.github.io/tags/vscode/>vscode</a>
+<a href=https://mlyixi.github.io/tags/wireshark/>wireshark</a>
+<a href=https://mlyixi.github.io/tags/zsh/>zsh</a>
+<a href=https://mlyixi.github.io/tags/%E4%BA%A4%E6%8D%A2/>交换</a>
+<a href=https://mlyixi.github.io/tags/%E5%8F%A4%E5%85%B8%E8%87%AA%E7%94%B1%E4%B8%BB%E4%B9%89/>古典自由主义</a>
+<a href=https://mlyixi.github.io/tags/%E5%A4%9A%E7%BD%91%E5%8D%A1/>多网卡</a>
+<a href=https://mlyixi.github.io/tags/%E5%BC%80%E6%BA%90/>开源</a>
+<a href=https://mlyixi.github.io/tags/%E6%8A%A5%E6%96%87/>报文</a>
+<a href=https://mlyixi.github.io/tags/%E6%95%B0%E6%8D%AE%E5%8C%85/>数据包</a>
+<a href=https://mlyixi.github.io/tags/%E6%9D%82%E8%B0%88/>杂谈</a>
+<a href=https://mlyixi.github.io/tags/%E6%A6%82%E7%8E%87%E8%AE%BA/>概率论</a>
+<a href=https://mlyixi.github.io/tags/%E6%B5%8B%E7%BB%98/>测绘</a>
+<a href=https://mlyixi.github.io/tags/%E7%A1%AC%E7%9B%98/>硬盘</a>
+<a href=https://mlyixi.github.io/tags/%E7%BD%91%E5%85%B3/>网关</a>
+<a href=https://mlyixi.github.io/tags/%E8%BD%AF%E4%BB%B6/>软件</a></div></section><section class=widget><h3 class=widget-title>其它</h3><ul class=widget-list><li><a href=https://mlyixi.github.io/index.xml>文章 RSS</a></li></ul></section></div></div></div></div></body></html>

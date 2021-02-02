@@ -1,0 +1,144 @@
+<!doctype html><html lang=zh-cn><head><meta charset=utf-8><meta http-equiv=x-ua-compatible content="IE=edge"><meta name=viewport content="width=device-width,initial-scale=1"><meta name=referrer content="no-referrer-when-downgrade"><title>Linux防火墙1 | mlyixi的博客</title><meta property="og:title" content="Linux防火墙1 - mlyixi的博客"><meta property="og:type" content="article"><meta property="article:published_time" content="2014-09-25T10:08:52+08:00"><meta property="article:modified_time" content="2014-09-25T10:08:52+08:00"><meta name=Keywords content="学习、研究、工作"><meta name=description content="Linux防火墙1"><meta name=author content="mlyixi"><meta property="og:url" content="https://mlyixi.github.io/post/linux/Linux%E9%98%B2%E7%81%AB%E5%A2%991/"><link rel="shortcut icon" href=https://mlyixi.github.io/favicon.ico type=image/x-icon><link rel=stylesheet href=https://mlyixi.github.io/css/normalize.css><link rel=stylesheet href=https://mlyixi.github.io/css/style.css><script type=text/javascript src=//cdn.bootcdn.net/ajax/libs/jquery/3.4.1/jquery.min.js></script><link href=https://cdn.bootcdn.net/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css rel=stylesheet></head><body><header id=header class=clearfix><div class=container><div class=col-group><div class=site-name><a id=logo href=https://mlyixi.github.io/>mlyixi的博客</a><p class=description>欲望的唤醒，信仰的坚定</p></div><div><nav id=nav-menu class=clearfix><a class=current href=https://mlyixi.github.io/>首页</a>
+<a href=https://mlyixi.github.io/tools/ title=工具>工具</a>
+<a href=https://mlyixi.github.io/archives/ title=归档>归档</a>
+<a href=https://mlyixi.github.io/about/ title=关于>关于</a></nav></div></div></div></header><div id=body><div class=container><div class=col-group><div class=col-8 id=main><div class=res-cons><style type=text/css>.post-toc{position:fixed;width:200px;margin-left:-210px;padding:5px 10px;font-family:Athelas,STHeiti,Microsoft Yahei,serif;font-size:12px;border:1px solid rgba(0,0,0,.07);border-radius:5px;background-color:rgba(255,255,255,.98);background-clip:padding-box;-webkit-box-shadow:1px 1px 2px rgba(0,0,0,.125);box-shadow:1px 1px 2px rgba(0,0,0,.125);word-wrap:break-word;white-space:nowrap;-webkit-box-sizing:border-box;box-sizing:border-box;z-index:999;cursor:pointer;max-height:70%;overflow-y:auto;overflow-x:hidden}.post-toc .post-toc-title{width:100%;margin:0 auto;font-size:20px;font-weight:400;text-transform:uppercase;text-align:center}.post-toc .post-toc-content{font-size:15px}.post-toc .post-toc-content>nav>ul{margin:10px 0}.post-toc .post-toc-content ul{padding-left:20px;list-style:square;margin:.5em;line-height:1.8em}.post-toc .post-toc-content ul ul{padding-left:15px;display:none}@media print,screen and (max-width:1057px){.post-toc{display:none}}</style><div class=post-toc style=position:absolute;top:188px><h2 class=post-toc-title>文章目录</h2><div class=post-toc-content><nav id=TableOfContents><ul><li><a href=#iptables与netfilter>iptables与netfilter</a></li><li><a href=#iptables结构>iptables结构</a></li><li><a href=#数据流结构>数据流结构</a></li><li><a href=#优先顺序>优先顺序</a><ul><li><a href=#表>表</a></li><li><a href=#链>链</a></li></ul></li><li><a href=#策略>策略</a></li><li><a href=#iptables常用命令>iptables常用命令</a></li><li><a href=#管理和设置iptables规则>管理和设置iptables规则</a><ul><li><a href=#command说明>command说明</a></li><li><a href=#parameter说明>parameter说明</a></li><li><a href=#目标-j>目标<code>-j</code></a></li></ul></li><li><a href=#实战>实战</a></li></ul></nav></div></div><script type=text/javascript>$(document).ready(function(){var postToc=$(".post-toc");if(postToc.length){var leftPos=$("#main").offset().left;if(leftPos<220){postToc.css({"width":leftPos-10,"margin-left":(0-leftPos)})}
+var t=postToc.offset().top-20,a={start:{position:"absolute",top:t},process:{position:"fixed",top:20},};$(window).scroll(function(){var e=$(window).scrollTop();e<t?postToc.css(a.start):postToc.css(a.process)})}})</script><article class=post><header><h1 class=post-title>Linux防火墙1</h1></header><date class="post-meta meta-date">2014年9月25日</date><div class=post-meta><span>|</span>
+<span class=meta-category><a href=https://mlyixi.github.io/categories/Linux>Linux</a></span></div><div class=post-meta><span id=busuanzi_container_page_pv>|<span id=busuanzi_value_page_pv></span><span>
+阅读</span></span></div><div class=clear style=display:none><div class=toc-article><div class=toc-title>文章目录</div></div></div><div class=post-content><h2 id=iptables与netfilter>iptables与netfilter</h2><p>经常混用,不过iptables指的是防火墙的管理工具而netfilter指的是linux实现防火墙的内核模块.</p><h2 id=iptables结构>iptables结构</h2><ul><li>表(Tables)
+现在一般有5种内建表,Filter表, NAT表,Mangle表,Raw表和security表,分别用于包过滤,网络地址转换,包重构,数据跟踪处理和MAC层安全处理.</li><li>链(Chains)
+链可以看成是数据流结构中的节点,表和链其实是iptables的两个维度,而不是表包含链,链包含规则这种关系.不同的内建表针对不同的功能,所以包含不同的链.脱离数据流结构谈链是不切实际的,所以具体见下一段.</li><li>规则(Rules)
+对同时流经表和链的数据包的一些规定,称为目标值,包括accept,drop, queue,return.</li></ul><h2 id=数据流结构>数据流结构</h2><p><figure class="max-w-2xl mx-auto overflow-hidden"><a data-fancybox=gallery href=https://mlyixi.github.io/linux/iptables_dataflow.png><img alt=Alt src=https://mlyixi.github.io/linux/iptables_dataflow.png></a><figcaption class="p-2 text-center">数据流结构</figcaption></figure></p><ol><li>首先,当一个数据包进入网卡时,首先进入PREROUTING链,内核根据数据包目的IP判断是否需要转发(NAT)。</li><li>如果数据包是发往本机的,它就不需要转发,所以进入INPUT链, 然后到达本机处理,再经OUTPUT和POSTROUTING输出.</li><li>如果数据包不是发往本机的,它就会转发,这里的条件是内核开启转发.这是实现NAT的必要条件.在/etc/sysctl.conf文件中设置<code>net.ipv4.ip_forward=1</code>然后运行<code>sysctl -p</code>.</li></ol><h2 id=优先顺序>优先顺序</h2><h3 id=表>表</h3><p>Raw>Mangle>NAT>Filter</p><h3 id=链>链</h3><ul><li>入站数据流
+从外界到达防火墙的数据包，先被PREROUTING规则链处理（是否修改数据包地址等），之后会进行路由选择（判断该数据包应该发往何处），如果数据包的目标主机是防火墙本机（比如说Internet用户访问防火墙主机中的web服务器的数据包），那么内核将其传给INPUT链进行处理（决定是否允许通过等），通过以后再交给系统上层的应用程序（比如Apache服务器）进行响应。</li><li>转发数据流
+来自外界的数据包到达防火墙后，首先被PREROUTING规则链处理，之后会进行路由选择，如果数据包的目标地址是其它外部地址（比如局域网用户通过网关访问QQ站点的数据包），则内核将其传递给FORWARD链进行处理（是否转发或拦截），然后再交给POSTROUTING规则链（是否修改数据包的地址等）进行处理。</li><li>出站数据流
+防火墙本机向外部地址发送的数据包（比如在防火墙主机中测试公网DNS服务器时），首先被OUTPUT规则链处理，之后进行路由选择，然后传递给POSTROUTING规则链（是否修改数据包的地址等）进行处理。</li></ul><h2 id=策略>策略</h2><p>当所有规则都匹配完后所要执行的规则,是ACCEPT或DROP掉.默认是ACCEPT.所以在制定规则时有两种考虑,第一种是DROP掉,只让想要的数据包通过.另一种是全部ACCEPT,只过滤掉不想要的数据包.一般而言实际中都采用第一种策略.</p><h2 id=iptables常用命令>iptables常用命令</h2><ul><li><code>iptables -t filter --list</code>: 显示filter表的规则</li><li><code>iptables -F</code>: 清空所有规则或<code>iptables -t NAT -F</code></li><li><code>iptables-save>/etc/iptables.rules</code>: 保存现有规则</li><li><code>iptables-restore &lt; /etc/iptables.rules</code>: 加载规则</li><li><code>iptables -S</code>: 显示某链的所有规则.</li><li><code>iptables -t filter -P INPUT ACCEPT</code>: 定义filter表的INPUT链的策略为ACCEPT.</li></ul><h2 id=管理和设置iptables规则>管理和设置iptables规则</h2><p><figure class="max-w-2xl mx-auto overflow-hidden"><a data-fancybox=gallery href=https://mlyixi.github.io/linux/iptables_cmd.jpg><img alt=Alt src=https://mlyixi.github.io/linux/iptables_cmd.jpg></a><figcaption class="p-2 text-center">iptables命令</figcaption></figure><figure class="max-w-2xl mx-auto overflow-hidden"><a data-fancybox=gallery href=https://mlyixi.github.io/linux/iptables_filter.jpg><img alt=Alt src=https://mlyixi.github.io/linux/iptables_filter.jpg></a><figcaption class="p-2 text-center">iptables过滤条件</figcaption></figure></p><h3 id=command说明>command说明</h3><ul><li><code>-A, --append</code>: 新增规则到某个规则链中，该规则将会成为规则链中的最后一条规则。</li><li><code>-D, --delete</code>: 从某个规则链中删除一条规则，可以输入完整规则，或直接指定规则编号加以删除。</li><li><code>-I, --insert</code>: 插入一条规则，原本该位置上的规则将会往后移动一个顺位。</li><li><code>-R, --replace</code>: 取代现行规则，规则被取代后并不会改变顺序。</li><li><code>-L, --list</code>: 列出某规则链中的所有规则。</li><li><code>-F, --flush</code>: 删除某规则链中的所有规则。</li><li><code>-Z, --zero</code>: 将封包计数器归零。封包计数器是用来计算同一封包出现次数，是过滤阻断式攻击不可或缺的工具。</li><li><code>-N, --new-chain</code>: 定义新的规则链.</li><li><code>-X, --delete-chain</code>: 删除某个规则链。</li><li><code>-P, --policy</code>: 定义过滤政策。 也就是未符合过滤条件之封包，预设的处理方式。</li><li><code>-E, --rename-chain</code>: 修改某自订规则链的名称。</li></ul><h3 id=parameter说明>parameter说明</h3><ul><li><code>-p, --protocol</code>: 比对通讯协议类型是否相符，可以使用 ! 运算子进行反向比对，例如：<code>-p ! tcp</code>，意思是指除 tcp 以外的其它类型，包含udp、icmp &mldr;等。如果要比对所有类型，则可以使用 all 关键词，例如:<code>-p all</code>。</li><li><code>-s, --src, --source</code>: 用来比对封包的来源 IP，可以比对单机或网络，比对网络时请用数字来表示屏蔽，例如：-s 192.168.0.0/24，比对 IP 时可以使用 ! 运算子进行反向比对，例如：-s ! 192.168.0.0/24。</li><li><code>-d, --dst, --destination</code>: 用来比对封包的目的地 IP，设定方式同上。</li><li><code>-i, --in-interface</code>: 用来比对封包是从哪片网卡进入，可以使用通配字符 + 来做大范围比对，例如：-i eth+ 表示所有的 ethernet 网卡，也以使用 ! 运算子进行反向比对，例如：-i ! eth0。</li><li><code>-o, --out-interface</code>: 用来比对封包要从哪片网卡送出，设定方式同上。</li><li><code>--sport, --source-port</code>: 用来比对封包的来源端口，可以比对单一端口，或是一个范围，例如：&ndash;sport 22:80，表示从 22 到 80 端口之间都算是符合件，如果要比对不连续的多个端口，则必须使用 &ndash;multiport 参数，详见后文。比对端口时，可以使用 ! 运算子进行反向比对。</li><li><code>--dport, --destination-port</code>: 用来比对封包的目的端口，设定方式同上。</li><li><code>--tcp-flags</code>: 比对 TCP 封包的状态旗号，</li><li><code>--syn</code>: 用来比对是否为要求联机之 TCP 封包，与 iptables -p tcp &ndash;tcp-flags SYN,FIN,ACK SYN 的作用完全相同，如果使用 !运算子，可用来比对非要求联机封包。</li><li><code>-m multiport --source-port</code>: 用来比对不连续的多个来源端口.</li><li><code>-m multiport --destination-port</code>: 用来比对不连续的多个目的端口.</li><li><code>--icmp-type</code>: 用来比对 ICMP 的类型编号</li><li>&mldr;</li></ul><h3 id=目标-j>目标<code>-j</code></h3><ul><li><code>accept</code>: 将封包放行，进行完此处理动作后，将不再比对其它规则，直接跳往下一个规则链.</li><li><code>reject</code>: 拦阻该封包，并传送封包通知对方</li><li><code>drop</code>: 丢弃封包不予处理，进行完此处理动作后，将不再比对其它规则，直接中断过滤程序</li><li><code>redirect</code>: 将封包重新导向到另一个端口（PNAT），进行完此处理动作后，将 会继续比对其它规则。 这个功能可以用来实作通透式porxy 或用来保护 web 服务器。例如：<code>iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-ports 8080</code></li><li><code>MASQUERADE</code>: 改写封包来源 IP 为防火墙 NIC IP，可以指定 port 对应的范围，进行完此处理动作后，直接跳往下一个规则链. SNAT的一种特殊形式，适用于像adsl这种临时会变的ip上.</li><li><code>LOG</code>: 将封包相关讯息纪录在 /var/log 中，详细位置请查阅 /etc/syslog.conf 组态档，进行完此处理动作后，将会继续比对其规则</li><li><code>SNAT</code>: 改写封包来源 IP 为某特定 IP 或 IP 范围，可以指定 port 对应的范围，进行完此处理动作后，将直接跳往下一个规则链. 扮演网关角色的机器和其他机器共享一个网络连接时使用,内网匿名访问外网.</li><li><code>DNAT</code>: 改写封包目的地 IP 为某特定 IP 或 IP 范围，可以指定 port 对应的范围，进行完此处理动作后，将会直接跳往下一个规则链. 用于将网络内部服务器掩藏起来.</li><li>&mldr;</li></ul><h2 id=实战>实战</h2><p>这里以处于防火墙内的网关服务器为例:</p><p>假设内网段192.168.1.0/24,内网卡eth0, 192.168.1.1,外网卡eth1, a.b.c.d.新建sh文件写入:</p><div class=highlight><div style=color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><table style=border-spacing:0;padding:0;margin:0;border:0;width:auto;overflow:auto;display:block><tr><td style=vertical-align:top;padding:0;margin:0;border:0><pre style=color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code><span style="margin-right:.4em;padding:0 .4em;color:#495050"> 1
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050"> 2
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050"> 3
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050"> 4
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050"> 5
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050"> 6
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050"> 7
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050"> 8
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050"> 9
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050">10
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050">11
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050">12
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050">13
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050">14
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050">15
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050">16
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050">17
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050">18
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050">19
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050">20
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050">21
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050">22
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050">23
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050">24
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050">25
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050">26
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050">27
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050">28
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050">29
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050">30
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050">31
+</span><span style="margin-right:.4em;padding:0 .4em;color:#495050">32
+</span></code></pre></td><td style=vertical-align:top;padding:0;margin:0;border:0;width:100%><pre style=color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-zsh data-lang=zsh><span style=color:#586e75># 清空表和链</span>
+iptables -F
+iptables -X 
+iptables -t nat -F
+iptables -t nat -X
+iptables -t mangle -F
+iptables -t mangle -X
+iptables -t raw -F
+iptables -t raw -X
+iptables -t security -F
+iptables -t security -X
+
+<span style=color:#586e75># 设置默认策略为接受</span>
+iptables -P INPUT ACCEPT
+iptables -P OUTPUT ACCEPT
+iptables -P FORWARD ACCEPT
+iptables -t nat -P PREROUTING ACCEPT
+iptables -t nat -P OUTPUT ACCEPT
+iptables -t nat -P POSTROUTING ACCEPT
+iptables -t mangle -P PREROUTING ACCEPT
+iptables -t mangle -P OUTPUT ACCEPT
+
+<span style=color:#586e75># 启动回环</span>
+iptables -A INPUT -i lo -j ACCEPT
+
+<span style=color:#586e75># 不过滤---filter表全通过</span>
+ptables -A OUTPUT -j ACCEPT
+iptables -A INPUT -j ACCEPT
+iptables -A FORWARD -j ACCEPT
+
+<span style=color:#586e75># SNAT</span>
+iptables -t nat -A POSTROUTING -s 192.168.1.0/24 -o eth1 -j SNAT --to a.b.c.d
+</code></pre></td></tr></table></div></div><h1 id=说明>说明</h1><p>经过以上的配置,内网机器应该可以访问Internet并能访问网关上的各种服务了,这说明我们写的规则成功了.但是是不是意味着外网机器也能访问网关呢? 当然不是啦,网关上面还有网关呢,那边设置了防火墙阻止包进入的话我们是不能让外网机器访问到网关的.</p></div><div class=post-archive><ul class=post-copyright><li><strong>原文作者：</strong><a rel=author href=https://mlyixi.github.io/>mlyixi</a></li><li style=word-break:break-all><strong>原文链接：</strong><a href=https://mlyixi.github.io/post/linux/Linux%E9%98%B2%E7%81%AB%E5%A2%991/>https://mlyixi.github.io/post/linux/Linux%E9%98%B2%E7%81%AB%E5%A2%991/</a></li><li><strong>版权声明：</strong>本作品采用<a rel=license href=https://creativecommons.org/licenses/by-nc-nd/4.0/>知识共享署名-非商业性使用-禁止演绎 4.0 国际许可协议</a>进行许可，非商业转载请注明出处（作者，原文链接），商业转载请联系作者获得授权。</li></ul></div><br><div class=post-archive><h2>See Also</h2><ul class=listing><li><a href=https://mlyixi.github.io/post/cs/MATLAB%E5%9F%BA%E7%A1%80/>MATLAB基础</a></li><li><a href=https://mlyixi.github.io/post/cs/postgres%E5%9F%BA%E7%A1%80/>postgres基础</a></li><li><a href=https://mlyixi.github.io/post/cs/latex%E7%B3%BB%E7%BB%9F%E8%AF%B4%E6%98%8E/>latex系统说明</a></li><li><a href=https://mlyixi.github.io/post/cs/%E7%A1%AC%E7%9B%98%E6%8E%A5%E5%8F%A3%E4%B8%8E%E5%8F%82%E6%95%B0/>硬盘接口与参数</a></li><li><a href=https://mlyixi.github.io/post/math/Probability-Theory-the-logic-of-science/>Probability Theory: the logic of science</a></li></ul></div><div class="post-meta meta-tags"><ul class=clearfix><li><a href=https://mlyixi.github.io/tags/iptables>iptables</a></li></ul></div></article></div><footer id=footer><div>&copy; 2021 <a href=https://mlyixi.github.io/>mlyixi的博客 By mlyixi</a></div><br><div><div class=github-badge><a href=https://gohugo.io/ target=_black rel=nofollow><span class=badge-subject>Powered by</span><span class="badge-value bg-blue">Hugo</span></a></div><div class=github-badge><a href=https://www.flysnow.org/ target=_black><span class=badge-subject>Design by</span><span class="badge-value bg-brightgreen">飞雪无情</span></a></div><div class=github-badge><a href=https://github.com/flysnow-org/maupassant-hugo target=_black><span class=badge-subject>Theme</span><span class="badge-value bg-yellowgreen">Maupassant</span></a></div></div></footer><script type=text/javascript>window.MathJax={tex2jax:{inlineMath:[['$','$']],processEscapes:true}};</script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML" async></script><script src=https://cdn.bootcdn.net/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js></script><a id=rocket href=#top></a><script type=text/javascript src="https://mlyixi.github.io/js/totop.js?v=0.0.0" async></script><script type=text/javascript src=//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js async></script></div><div id=secondary><section class=widget><form id=search action=https://mlyixi.github.io/search/ method=get accept-charset=utf-8 target=_blank _lpchecked=1><input type=text name=q maxlength=20 placeholder=Search>
+<input type=hidden name=sitesearch value=https://mlyixi.github.io/>
+<button type=submit class="submit icon-search"></button></form></section><section class=widget><h3 class=widget-title>最近文章</h3><ul class=widget-list><li><a href=https://mlyixi.github.io/post/cs/git%E7%AE%80%E6%98%93%E6%9C%8D%E5%8A%A1%E5%99%A8/ title=git简易服务器>git简易服务器</a></li><li><a href=https://mlyixi.github.io/post/network/dpi%E5%B7%A5%E5%85%B7%E6%AF%94%E8%BE%83/ title=DPI工具比较>DPI工具比较</a></li><li><a href=https://mlyixi.github.io/post/network/tinyfecVPN/ title=TinyfecVPN>TinyfecVPN</a></li><li><a href=https://mlyixi.github.io/post/linux/NFS%E6%9C%8D%E5%8A%A1%E5%99%A8/ title=NFS服务器>NFS服务器</a></li><li><a href=https://mlyixi.github.io/post/network/IOL_DHCP%E9%85%8D%E7%BD%AE/ title=IOL_DHCP配置>IOL_DHCP配置</a></li><li><a href=https://mlyixi.github.io/post/cs/mysql%E5%90%AF%E7%94%A8%E8%BF%9C%E7%A8%8B%E8%BF%9E%E6%8E%A5/ title=Mysql启用远程连接>Mysql启用远程连接</a></li><li><a href=https://mlyixi.github.io/post/network/security_onion%E4%B8%8EOSSIM%E6%AF%94%E8%BE%83/ title=Security_onion与OSSIM比较>Security_onion与OSSIM比较</a></li><li><a href=https://mlyixi.github.io/post/cs/%E4%BB%A3%E7%A0%81%E5%A4%A7%E5%85%A8/ title=代码大全>代码大全</a></li><li><a href=https://mlyixi.github.io/post/network/%E7%BD%91%E7%BB%9C%E7%A9%BA%E9%97%B4%E6%B5%8B%E7%BB%98%E6%8A%80%E6%9C%AF/ title=网络空间测绘技术>网络空间测绘技术</a></li><li><a href=https://mlyixi.github.io/post/network/%E8%A7%A3%E6%9E%90%E8%B6%85%E7%BA%A7%E8%99%9A%E6%8B%9F%E5%AE%9E%E9%AA%8C%E5%AE%A4eve-ng%E7%9A%84%E5%B7%A5%E4%BD%9C%E6%A8%A1%E5%BC%8F/ title="解析超级虚拟实验室eve Ng的工作模式">解析超级虚拟实验室eve Ng的工作模式</a></li></ul></section><section class=widget><h3 class=widget-title><a href=https://mlyixi.github.io/categories/>分类</a></h3><ul class=widget-list><li><a href=https://mlyixi.github.io/categories/CS/>CS (34)</a></li><li><a href=https://mlyixi.github.io/categories/Linux/>Linux (26)</a></li><li><a href=https://mlyixi.github.io/categories/ML/>ML (6)</a></li><li><a href=https://mlyixi.github.io/categories/OSX/>OSX (10)</a></li><li><a href=https://mlyixi.github.io/categories/math/>math (24)</a></li><li><a href=https://mlyixi.github.io/categories/network/>network (14)</a></li><li><a href=https://mlyixi.github.io/categories/signal/>signal (3)</a></li><li><a href=https://mlyixi.github.io/categories/social/>social (5)</a></li></ul></section><section class=widget><h3 class=widget-title><a href=https://mlyixi.github.io/tags/>标签</a></h3><div class=tagcloud><a href=https://mlyixi.github.io/tags/Archlinux/>Archlinux</a>
+<a href=https://mlyixi.github.io/tags/CodeSignBreak%E5%8F%91%E5%B8%83/>CodeSignBreak发布</a>
+<a href=https://mlyixi.github.io/tags/DHCP/>DHCP</a>
+<a href=https://mlyixi.github.io/tags/DPI/>DPI</a>
+<a href=https://mlyixi.github.io/tags/Doxygen/>Doxygen</a>
+<a href=https://mlyixi.github.io/tags/GAN/>GAN</a>
+<a href=https://mlyixi.github.io/tags/Graphviz/>Graphviz</a>
+<a href=https://mlyixi.github.io/tags/IOL/>IOL</a>
+<a href=https://mlyixi.github.io/tags/IPv6/>IPv6</a>
+<a href=https://mlyixi.github.io/tags/KDE/>KDE</a>
+<a href=https://mlyixi.github.io/tags/MAB/>MAB</a>
+<a href=https://mlyixi.github.io/tags/MATLAB/>MATLAB</a>
+<a href=https://mlyixi.github.io/tags/MathJax/>MathJax</a>
+<a href=https://mlyixi.github.io/tags/Mysql/>Mysql</a>
+<a href=https://mlyixi.github.io/tags/NFS/>NFS</a>
+<a href=https://mlyixi.github.io/tags/OSSIM/>OSSIM</a>
+<a href=https://mlyixi.github.io/tags/PATH/>PATH</a>
+<a href=https://mlyixi.github.io/tags/PRML/>PRML</a>
+<a href=https://mlyixi.github.io/tags/PT/>PT</a>
+<a href=https://mlyixi.github.io/tags/ProGit/>ProGit</a>
+<a href=https://mlyixi.github.io/tags/SecurityOnion/>SecurityOnion</a>
+<a href=https://mlyixi.github.io/tags/UEFI/>UEFI</a>
+<a href=https://mlyixi.github.io/tags/VPS/>VPS</a>
+<a href=https://mlyixi.github.io/tags/Windows/>Windows</a>
+<a href=https://mlyixi.github.io/tags/aircrack-ng/>aircrack-ng</a>
+<a href=https://mlyixi.github.io/tags/bash/>bash</a>
+<a href=https://mlyixi.github.io/tags/bind9/>bind9</a>
+<a href=https://mlyixi.github.io/tags/cmake/>cmake</a>
+<a href=https://mlyixi.github.io/tags/docker/>docker</a>
+<a href=https://mlyixi.github.io/tags/eve-ng/>eve-ng</a>
+<a href=https://mlyixi.github.io/tags/git/>git</a>
+<a href=https://mlyixi.github.io/tags/github/>github</a>
+<a href=https://mlyixi.github.io/tags/gnuradio/>gnuradio</a>
+<a href=https://mlyixi.github.io/tags/gpg/>gpg</a>
+<a href=https://mlyixi.github.io/tags/hackintosh/>hackintosh</a>
+<a href=https://mlyixi.github.io/tags/homebrew/>homebrew</a>
+<a href=https://mlyixi.github.io/tags/iOS/>iOS</a>
+<a href=https://mlyixi.github.io/tags/iproute/>iproute</a>
+<a href=https://mlyixi.github.io/tags/iptables/>iptables</a>
+<a href=https://mlyixi.github.io/tags/latex/>latex</a>
+<a href=https://mlyixi.github.io/tags/man/>man</a>
+<a href=https://mlyixi.github.io/tags/markdown/>markdown</a>
+<a href=https://mlyixi.github.io/tags/n2n/>n2n</a>
+<a href=https://mlyixi.github.io/tags/nc/>nc</a>
+<a href=https://mlyixi.github.io/tags/ntp/>ntp</a>
+<a href=https://mlyixi.github.io/tags/postgresql/>postgresql</a>
+<a href=https://mlyixi.github.io/tags/python/>python</a>
+<a href=https://mlyixi.github.io/tags/signal/>signal</a>
+<a href=https://mlyixi.github.io/tags/ubuntu/>ubuntu</a>
+<a href=https://mlyixi.github.io/tags/vim/>vim</a>
+<a href=https://mlyixi.github.io/tags/vpn/>vpn</a>
+<a href=https://mlyixi.github.io/tags/vscode/>vscode</a>
+<a href=https://mlyixi.github.io/tags/wireshark/>wireshark</a>
+<a href=https://mlyixi.github.io/tags/zsh/>zsh</a>
+<a href=https://mlyixi.github.io/tags/%E4%BA%A4%E6%8D%A2/>交换</a>
+<a href=https://mlyixi.github.io/tags/%E5%8F%A4%E5%85%B8%E8%87%AA%E7%94%B1%E4%B8%BB%E4%B9%89/>古典自由主义</a>
+<a href=https://mlyixi.github.io/tags/%E5%A4%9A%E7%BD%91%E5%8D%A1/>多网卡</a>
+<a href=https://mlyixi.github.io/tags/%E5%BC%80%E6%BA%90/>开源</a>
+<a href=https://mlyixi.github.io/tags/%E6%8A%A5%E6%96%87/>报文</a>
+<a href=https://mlyixi.github.io/tags/%E6%95%B0%E6%8D%AE%E5%8C%85/>数据包</a>
+<a href=https://mlyixi.github.io/tags/%E6%9D%82%E8%B0%88/>杂谈</a>
+<a href=https://mlyixi.github.io/tags/%E6%A6%82%E7%8E%87%E8%AE%BA/>概率论</a>
+<a href=https://mlyixi.github.io/tags/%E6%B5%8B%E7%BB%98/>测绘</a>
+<a href=https://mlyixi.github.io/tags/%E7%A1%AC%E7%9B%98/>硬盘</a>
+<a href=https://mlyixi.github.io/tags/%E7%BD%91%E5%85%B3/>网关</a>
+<a href=https://mlyixi.github.io/tags/%E8%BD%AF%E4%BB%B6/>软件</a></div></section><section class=widget><h3 class=widget-title>其它</h3><ul class=widget-list><li><a href=https://mlyixi.github.io/index.xml>文章 RSS</a></li></ul></section></div></div></div></div></body></html>
